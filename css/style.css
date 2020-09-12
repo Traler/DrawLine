@@ -1,0 +1,199 @@
+/*horizontal menu*/
+
+header{
+    border-bottom: solid black 1px;
+    margin: 0px;
+    margin-left: 10px;
+    padding: 0px;
+}
+
+.horizontal-menu *{
+    transition: all 0.3s ease;
+    z-index: 9999999999;
+    margin: 0px;
+    padding: 0px;
+}
+
+.horizontal-menu > ul{
+    display: flex;
+    font-size: 17px;
+}
+
+.horizontal-menu > ul li {
+    position: relative;
+}
+
+.horizontal-menu > ul li ul {
+    font-size: 15px;
+}
+
+.horizontal-menu > ul > li > ul{
+    padding: 5px;
+    margin-left: -10px;
+}
+
+.horizontal-menu ul > li{
+    padding: 5px;
+    margin: 0px;
+}
+
+.horizontal-menu > ul > li{
+    margin: 2px;
+}
+
+.horizontal-menu > ul li div{
+    display: inline-block;
+}
+
+.horizontal-menu li:hover{
+    background-color: rgb(97, 97, 97);
+/*    box-shadow: rgb(75, 72, 72) 1px 5px 10px -5px;*/
+    box-shadow: white 2px 9px 82px -29px;
+    transition: all 0.3s ease;
+}
+
+.horizontal-menu li ul{
+    position: absolute;
+    min-width: 150px;
+    display: none;
+}
+
+.horizontal-menu li > ul li{
+    background-color: rgb(97, 97, 97);
+    padding: 2px;
+     
+}
+
+.horizontal-menu li > ul li:hover{
+    background-color: rgb(122, 112, 112);
+}
+
+.horizontal-menu li > ul li ul{
+    position: absolute;
+    right: -150px;
+    top: 0;
+}
+
+.horizontal-menu li:hover > ul{
+    display: block;
+}
+
+/*paint*/
+
+.paint{
+    display: block;
+    height: 601px;
+    margin-top: 15px;
+}
+
+.canvases{
+    position: relative;
+    height: 601px;
+    width: 601px;
+    margin-left: auto;
+    margin-right: auto;
+/*    border: solid white 1px;*/
+}
+
+.canvas{
+    position: absolute;
+}
+
+#backgroundCanv{
+    background-repeat: no-repeat;
+    background-size: contain;
+    opacity: 30%;
+    background-color: rgb(55, 58, 56);
+}
+
+/* vertical-menu */
+
+.vertical-menu{
+    position: absolute;
+    display: block;
+    background-color: rgb(85, 85, 85);
+    padding: 10px;
+}
+
+.vertical-menu > li > img{
+    display: inline-block;
+    margin-top: 4px;
+}
+
+
+/*css from all elem*/
+
+body{
+    background-color: rgb(61, 61, 61);
+    margin: 0px;
+    padding: 0px;
+}
+
+.paint, header, .vertical-menuv{
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
+.coordView{
+    position: absolute;
+    margin: 3px;
+    padding: 1px;
+    z-index: 99999;
+    pointer-events: none;
+    border: solid rgb(123, 255, 123) 1px;
+    font-size: 15px;
+    background-color: rgb(135, 211, 12);
+    width: max-content;
+    display: none;
+}
+
+
+li{
+    list-style: none;
+}
+
+li > div{
+    font-family: cursive;
+    color: white;
+}
+
+#viewCoords{
+    position: absolute;
+    display: inline-block;
+    right: 11px;
+    width: 21px;
+    height: 21px;
+}
+
+svg{
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    stroke-width: 2px;
+    stroke:white;
+    fill:rgba(0, 0, 0, 0);
+}
+
+svg:hover{
+    background-color: rgb(129, 129, 129);
+}
+
+.save{
+    text-decoration: none;
+    color: white;
+}
+
+.rightLi{
+    position: absolute;
+    right: 9px;
+    width: auto;
+    height: auto;
+    font-size: 16px;
+}
+
+/*css from all elem*/

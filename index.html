@@ -1,0 +1,144 @@
+<html>
+    <head>
+        <title></title>
+        <link rel="stylesheet" href="css/style.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="utf-8">
+    </head>
+    <body>
+       <header>
+            <div class="horizontal-menu">
+                <ul>
+                    <li><div>File</div>
+                        <ul>
+                            <li><div>New</div>
+                                <ul>
+                                    <li><div>Image</div></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <div><a class="save">Save</a></div>
+                                <div class="rightLi">S</div>
+                            </li>
+                            <li><div>Save as</div></li>
+                            <li>
+                                <div class="changeBackground">Grid background</div>
+                                <div class="rightLi">I</div>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><div>Edit</div></li>
+                    <li><div>Object</div></li>
+                    <li><div>Type</div></li>
+                    <li><div>Select</div></li>
+                    <li><div>View</div>
+                        <ul>
+                            <li>
+                                <div>Coord view</div>
+                                <div id="viewCoords">Off</div>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><div>Window</div></li>
+                    <li><div>Help</div>
+                        <ul>
+                            <li><div class="vertion">vertion 4.2</div>
+                                <ul>
+                                    <li><div>hello</div></li>
+                                    <li><div>hello</div></li>
+                                    <li><div>hello</div></li>
+                                    <li><div>hello</div></li>
+                                    <li><div>hello</div></li>
+                                    <li><div>hello</div></li>
+                                    <li><div>hello</div></li>
+                                    <li><div>hello</div></li>
+                                    <li><div>hello</div></li>
+                                    <li><div>hello</div></li>
+                                </ul>
+                            </li>
+                            <li><div>vertion 4.2</div>
+                                <ul>
+                                    <li><div>welcome</div></li>
+                                    <li><div>welcome</div></li>
+                                    <li><div>welcome</div></li>
+                                    <li><div>welcome</div></li>
+                                    <li><div>welcome</div></li>
+                                    <li><div>welcome</div></li>
+                                    <li><div>welcome</div></li>
+                                    <li><div>welcome</div></li>
+                                    <li><div>welcome</div></li>
+                                    <li><div>welcome</div></li>
+                                    <li><div>welcome</div></li>
+                                    <li><div>welcome</div></li>
+                                    <li><div>welcome</div></li>
+                                    <li><div>welcome</div></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+       </header>
+        <div class="vertical-menu">
+            <li>
+                <div>Draw Color</div>
+                <input id="inputColor" type="color">
+                <div>Line width of grid</div>
+                <input id="widthGrid" value="1" type="range">
+            </li>
+            <p></p>
+            <li>
+                <div>Circle</div>
+                <svg>
+                    <circle cx="20" cy="20" r="18"/>
+                </svg>
+                <svg>
+                    <circle cx="0" cy="20" r="18"/>
+                </svg>
+                <svg>
+                    <circle cx="10" cy="20" r="9"/>
+                </svg>
+
+                <svg>
+                    <circle cx="20" cy="10" r="9"/>
+                </svg>
+                <svg>
+                    <circle cx="0" cy="10" r="9"/>
+                </svg>
+
+                <div></div>
+
+                <svg>
+                    <circle cx="20" cy="0" r="18"/>
+                </svg>
+                <svg>
+                    <circle cx="0" cy="0" r="18"/>
+                </svg>
+                <svg>
+                    <circle cx="10" cy="0" r="9"/>
+                </svg>
+               
+                <svg>
+                    <circle cx="10" cy="10" r="9"/>
+                </svg>
+            </li>
+            <li>
+                <div>Line</div>
+                <svg>
+                    <line x1="0" y1="0" x2="30" y2="30" stroke="white" stroke-width="2" />
+                </svg>
+            </li>
+        </div>
+       <div class="paint">
+            <div class="canvases" width="601" height="601">
+                <canvas class="canvas" id="backgroundCanv" width="601" height="601"></canvas>
+                <canvas class="canvas" width="601" height="601"></canvas>
+                <canvas class="canvas" width="601" height="601"></canvas>
+                <canvas class="canvas" width="601" height="601"></canvas>
+                <canvas class="canvas" id="cursorCanv" width="601" height="601"></canvas>
+                <div class="coordView" width="601" height="601"></div>
+            </div>
+       </div>
+    </body>
+    <script src="js/script.js"></script>
+</html>
