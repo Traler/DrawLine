@@ -27,10 +27,17 @@ let setFigure       = document.querySelectorAll('li > svg');       //svg config
 let save            = document.querySelector('.save');             //save the image
 let setBackground   = document.querySelector('.changeBackground'); //change background
 
+let saveAsLineListBtn = document.querySelector('.saveAsLineList'); //save as file for redraw
+let openLineListBtn   = document.querySelector('#openLineList');   //open the line list
+let newDocument       = document.querySelector('.newDocument');    //create a new document
+let viewGrid          = document.querySelector('.viewGrid');
+let viewBoolGrid      = document.querySelector('.viewBoolGrid');
+
 class Paint {
     //for grid
     widthCube;
     cellCount = 10;
+    boolGrid = true;
 
     //config color
     cursorColor = 'blue';
@@ -48,7 +55,6 @@ class Paint {
     drawing;
 
     //for key Press
-
     keyQPress = false;
     keyPressed = false;
 
@@ -72,24 +78,26 @@ class Paint {
     }
 
     drawGrid(cellCount = this.cellCount, widthLine = this.widthCubeLine){
-        this.widthCube = gridCanv.width / cellCount;
-        let widthCube = this.widthCube;
+        if(this.boolGrid){
+            this.widthCube = gridCanv.width / cellCount;
+            let widthCube = this.widthCube;
+            
+            this.clear();
         
-        this.clear();
-      
-        gridCtx.lineWidth = widthLine;
-      
-        for (let n = 0; n < cellCount*widthCube; n+=widthCube) {
-          for (let t = 0; t < cellCount*widthCube; t+=widthCube){
-            gridCanv.parentElement.style.border = '1px solid white';
-            gridCtx.strokeStyle = 'white';
-            gridCtx.beginPath();
-            gridCtx.strokeRect(n, t, widthCube, widthCube);
-            gridCtx.closePath();
-            gridCtx.stroke();
-          }
+            gridCtx.lineWidth = widthLine;
+        
+            for (let n = 0; n < cellCount*widthCube; n+=widthCube) {
+            for (let t = 0; t < cellCount*widthCube; t+=widthCube){
+                gridCanv.parentElement.style.border = '1px solid white';
+                gridCtx.strokeStyle = 'white';
+                gridCtx.beginPath();
+                gridCtx.strokeRect(n, t, widthCube, widthCube);
+                gridCtx.closePath();
+                gridCtx.stroke();
+            }
+            }
+            gridCtx.lineWidth = this.widthLine;
         }
-        gridCtx.lineWidth = this.widthLine;
     }
 
     drawLine(ctx, startedCoord, endedCoord, color){
@@ -206,25 +214,69 @@ class Paint {
     //horizontal-menu functions
 
     saveImage(canvas = imageCanv) {
-        /*
         let url = canvas.toDataURL();
-        let result = document.querySelector("#result");
-        result.src = url;
 
-        let link = document.createElement('a');
-        link.href = canvas.toDataURL();
-        link.download = "mypainting.png";
-        */
-     // let url = canvas.toDataURL();
-     // let url2 = encodeURIComponent(url);
-        let url = canvas.toDataURL();
-        save.href = url;
-        save.download = "mypainting.png"; 
-        console.log('saved');
+        let a = document.createElement("a"); 
+
+        document.body.appendChild(a);
+        a.style.display = 'none';
+        
+        a.href = url;
+        a.download = 'My image';
+        a.click();
+        
+        a.parentNode.removeChild(a);
     }
 
     changeBackground(){
         backgroundCanv.style.backgroundImage = "url('" + prompt('Change image url for background') + "')";
+    }
+
+    saveAsLineList(){
+        let a = document.createElement("a"); 
+
+        document.body.appendChild(a);
+        a.style.display = 'none';
+
+        let strA = JSON.stringify(paint.history);
+        
+        let file = new Blob([strA], {type: "text/javascript"});
+        a.href = URL.createObjectURL(file);
+        a.download = 'Line List.txt';
+        a.click();
+        
+        a.parentNode.removeChild(a);
+    }
+
+    openLineList(){
+        let that = this;
+        let input = document.createElement("input"); 
+
+        document.body.appendChild(input);
+        input.style.display = 'none';
+        input.type = 'file';
+
+        input.addEventListener('change', function(e){
+            let file = e.target.files[0];
+
+            if (!file) {
+                return;
+            }
+            let reader = new FileReader();
+
+            reader.onload = function(e) {
+                let data = e.target.result;
+                
+                let parseData = JSON.parse(data);
+                that.history = that.history.concat(parseData); 
+                
+                that.drawLinesFromObject(parseData);
+            };
+            reader.readAsText(file);
+        });
+
+        input.click();
+        input.parentNode.removeChild(input);
     }
 
     //logic
@@ -338,7 +390,8 @@ class Paint {
 
     eventClickListener(){
         let that = this;
-        viewCoord.parentElement.addEventListener('click', function(e){
+
+        viewCoord.parentElement.addEventListener('click', function(){
             if(viewCoord.innerHTML == 'On'){
                 viewCoord.innerHTML = 'Off';
                 coordView.style.display = 'none';
@@ -348,6 +401,18 @@ class Paint {
                 that.viewCoords(0, 0);
             }
         });
+
+        viewGrid.addEventListener('click', function(){
+            if(viewBoolGrid.innerHTML == 'On'){
+                viewBoolGrid.innerHTML = 'Off';
+                that.boolGrid = false;
+            }
+            if(viewBoolGrid.innerHTML == 'Off'){
+                viewBoolGrid.innerHTML = 'On';
+                that.boolGrid = true;
+            }
+        });
+
         setFigure.forEach(function(elem) {
             elem.addEventListener('click', function(){
                 that.keyQPress = true;
@@ -404,11 +469,28 @@ class Paint {
                 }
             });
         });
+
         save.addEventListener('click', function(){
             that.saveImage();
         });
+
         setBackground.addEventListener('click', function(){
             that.changeBackground();
+        });
+        
+        saveAsLineListBtn.addEventListener('click', function(){
+            that.saveAsLineList();
+        });
+        
+        openLineListBtn.addEventListener('click', function(){
+            that.openLineList();
+        });
+
+        newDocument.addEventListener('click', function(){
+            that.history.length = 0;
+            that.clear(imageCtx);
+            console.log('history cleared');
+            console.log('imageCtx cleared');
         });
     }
 
@@ -418,7 +500,7 @@ class Paint {
         inputColor.addEventListener('change', function(){
             that.drawColor = setDrawColor.value;
         });
-        
+
         widthGrid.max = 5;
         widthGrid.min = 0.1;
         widthGrid.step = 0.1;

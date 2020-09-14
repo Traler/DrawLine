@@ -162,7 +162,7 @@ li > div{
     color: white;
 }
 
-#viewCoords{
+.offOn{
     position: absolute;
     display: inline-block;
     right: 11px;
@@ -183,10 +183,6 @@ svg:hover{
     background-color: rgb(129, 129, 129);
 }
 
-.save{
-    text-decoration: none;
-    color: white;
-}
 
 .rightLi{
     position: absolute;

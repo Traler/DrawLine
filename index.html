@@ -2,7 +2,6 @@
     <head>
         <title></title>
         <link rel="stylesheet" href="css/style.css">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta charset="utf-8">
     </head>
     <body>
@@ -11,19 +10,25 @@
                 <ul>
                     <li><div>File</div>
                         <ul>
-                            <li><div>New</div>
+                            <li class="newDocument"><div>New document</div>
+                            </li>
+                            <li><div>Import</div>
                                 <ul>
-                                    <li><div>Image</div></li>
+                                    <li>
+                                        <div class="changeBackground">Image background</div>
+                                        <div class="rightLi">I</div>
+                                    </li>
+                                    <li id="openLineList">
+                                        <div>Line list</div>
+                                    </li>
                                 </ul>
                             </li>
-                            <li>
-                                <div><a class="save">Save</a></div>
+                            <li class="save">
+                                <div>Save</div>
                                 <div class="rightLi">S</div>
                             </li>
-                            <li><div>Save as</div></li>
-                            <li>
-                                <div class="changeBackground">Grid background</div>
-                                <div class="rightLi">I</div>
+                            <li class="saveAsLineList">
+                                <div>Save as Line List</div>
                             </li>
                         </ul>
                     </li>
@@ -35,8 +40,10 @@
                         <ul>
                             <li>
                                 <div>Coord view</div>
-                                <div id="viewCoords">Off</div>
+                                <div id="viewCoords" class="offOn">Off</div>
                             </li>
+                            <li class="viewGrid"><div>Grid</div></li>
+                            <div class="viewBoolGrid offOn">On</div>
                         </ul>
                     </li>
                     <li><div>Window</div></li>
