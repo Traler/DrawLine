@@ -92,7 +92,6 @@ header{
     width: 601px;
     margin-left: auto;
     margin-right: auto;
-/*    border: solid white 1px;*/
 }
 
 .canvas{
@@ -193,3 +192,12 @@ svg:hover{
 }
 
 /*css from all elem*/
+
+
+
+
+.circle{
+    display: inline-block;
+    background-color: white;
+    border-radius: 999999px;
+}

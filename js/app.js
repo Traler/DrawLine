@@ -25,7 +25,7 @@ class DL{
 
     grid = {
         color: 'white',
-        widthLine: 1,
+        widthLine: 0.5,
     }
 
     static isMouseDown = false;
@@ -34,7 +34,12 @@ class DL{
 
     static drawing;
 
-    static cursorColor = 'blue';
+    drawMode = {
+        line: true,
+        circle: false,
+        bezierCurve: false,
+        quadraticCurve: false,
+    }
 
     coord = {
         t: this,
@@ -46,6 +51,8 @@ class DL{
             x: -1,
             y: -1,
         },
+        inclineX: 601/2,
+        inclineY: 601/2,
         customRound(coord) {
             return this.t.widthCube * Math.round(coord / this.t.widthCube);
         },
@@ -67,8 +74,8 @@ class DL{
     };
 
     constructor(width, height) {
-        this.drawBoxSize.width = width;
-        this.drawBoxSize.height = height;
+        this.drawBoxSize.width = width + 1;
+        this.drawBoxSize.height = height + 1;
     }
 
     static init(){
@@ -99,31 +106,39 @@ class DL{
         }
     }
 
-    drawLine(ctx, startedCoord, endedCoord, color, width){
+    drawLine(ctx, color, width){
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.beginPath();
+        ctx.moveTo(this.coord.startedCoord.x, this.coord.startedCoord.y);
+        ctx.lineTo(this.coord.endedCoord.x, this.coord.endedCoord.y); 
+        ctx.closePath();
+        ctx.stroke();
+    }
+
+    drawBezierCurve(ctx = Interface.drawCtx, color, width){
         ctx.beginPath();
         ctx.strokeStyle = color;
         ctx.lineWidth = width;
-        ctx.moveTo(startedCoord.x, startedCoord.y);
-        ctx.lineTo(endedCoord.x, endedCoord.y);
-        ctx.stroke(); 
+        ctx.bezierCurveTo(this.coord.endedCoord.x, this.coord.endedCoord.y, this.coord.inclineX, this.coord.inclineY, this.coord.startedCoord.x, this.coord.startedCoord.y);
+        ctx.stroke();
         ctx.closePath();
     }
 
     drawCursor(x, y, ctx = Interface.cursorCtx){
         let widthLine = Interface.gridCtx.lineWidth + 4;
         let widthLine2 = (Interface.gridCtx.lineWidth / 0.5);
-      
+        this.clear(Interface.cursorCtx);
         let lineX = x - widthLine2;
         let lineY = y - widthLine2;
-        
-        this.clear(ctx);
+
         ctx.beginPath();
         ctx.lineWidth = this.cursor.width;
         ctx.fillStyle = this.cursor.color;
         ctx.fillRect(lineX, lineY, widthLine, widthLine);
         ctx.lineWidth = Interface.gridCtx.lineWidth;
         ctx.closePath();
-    }
+    }   
 
     clear(ctx = Interface.gridCtx){
         let width = this.drawBoxSize.width;
@@ -149,6 +164,18 @@ class DL{
     }
 
     //logic
+
+    clickListenerLogic(e){
+        let that = this;
+        let x = that.coord.localCoord(e).x;
+        let y = that.coord.localCoord(e).y;
+
+        let xRounded = that.coord.customRound(x);
+        let yRounded = that.coord.customRound(y);
+
+        this.coord.inclineX = xRounded; 
+        this.coord.inclineY = yRounded; 
+    }
    
     mouseLogic(e, value){
         let that = this;
@@ -156,51 +183,104 @@ class DL{
         let x = that.coord.localCoord(e).x;
         let y = that.coord.localCoord(e).y;
 
-        if(value == 'up'){
-            up();
-        }else if(value == 'move'){
-            move();
+        let xRounded = that.coord.customRound(x);
+        let yRounded = that.coord.customRound(y);
+
+        let startedCoord = that.coord.startedCoord;
+
+        let auxiliarie = that.line.auxiliarie;
+        let draw = that.line.draw;
+       
+        that.clear(Interface.cursorCtx);
+        that.drawCursor(xRounded, yRounded);
+
+        let callback = function(up, move){
+            if(value == 'up'){
+                up();
+            }else if(value == 'move'){
+                move();
+            }
+        };
+
+        if(that.drawMode.line){
+            lineLogic();
+        }
+
+        if(that.drawMode.bezierCurve){
+            bezierCurveLogic();
         }
 
         //draw the line
-       
-        function up(){
-            that.clear(Interface.drawCtx);
+        function lineLogic(){
+            function up(){
+                that.clear(Interface.drawCtx);
 
-            that.coord.setEndedCoord(x, y);
-            if(DL.isMouseDown && DL.drawing){
-                let line = that.line.draw;
-                that.drawLine(Interface.drawBoxCtx, that.coord.startedCoord, that.coord.endedCoord, line.color, line.width)
-                that.coord.sayCoords('DRAWING END', x, y)
+                that.coord.setEndedCoord(x, y);
+                if(DL.isMouseDown && DL.drawing){
+                    that.drawLine(Interface.drawBoxCtx, draw.color, draw.width)
+                    that.coord.sayCoords('DRAWING END', x, y)
+                }
+                DL.isMouseDown = false;
+                DL.drawing = false;
             }
-            DL.isMouseDown = false;
-            DL.drawing = false;
+
+            function move(){
+                that.coord.setEndedCoord(xRounded, yRounded);
+
+                if (DL.isMouseDown && !DL.drawing){
+                    that.coord.sayCoords('DRAWING FROM', x, y);
+                    DL.drawing = true;
+                
+                    startedCoord.x = xRounded;
+                    startedCoord.y = yRounded;
+                }
+
+                //draw the line
+                
+                if(DL.isMouseDown && DL.drawing) {
+                    that.clear(Interface.drawCtx);
+                    that.drawLine(Interface.drawCtx, auxiliarie.color, auxiliarie.width);
+                }
+            }
+
+            callback(up, move);
         }
 
-        function move(){
-            let xRounded = that.coord.customRound(x);
-            let yRounded = that.coord.customRound(y);
-        
-            that.coord.setEndedCoord(xRounded, yRounded);
+        //draw the bezierCurve
+        function bezierCurveLogic(){
 
-            that.drawCursor(xRounded, yRounded);
-
-        //  that.drawCursor(xRounded, yRounded);
-        
-            if (DL.isMouseDown && !DL.drawing){
-                that.coord.sayCoords('DRAWING FROM', x, y);
-                DL.drawing = true;
-            
-                that.coord.startedCoord.x = xRounded;
-                that.coord.startedCoord.y = yRounded;
-            }
-
-            //draw the line
-            
-            if(DL.isMouseDown && DL.drawing) {
+            function up(){
                 that.clear(Interface.drawCtx);
-                that.drawLine(Interface.drawCtx, that.coord.startedCoord, that.coord.endedCoord, that.line.auxiliarie.color, that.line.auxiliarie.width);
+
+                that.coord.setEndedCoord(x, y);
+                if(DL.isMouseDown && DL.drawing){
+                    that.drawBezierCurve(Interface.drawBoxCtx, draw.color, draw.width);
+                    that.coord.sayCoords('DRAWING END', x, y);
+                }
+                DL.isMouseDown = false;
+                DL.drawing = false;
             }
+
+            function move(){
+                that.coord.setEndedCoord(xRounded, yRounded);
+
+                if (DL.isMouseDown && !DL.drawing){
+                    that.coord.sayCoords('DRAWING FROM', x, y);
+                    DL.drawing = true;
+                    
+                    startedCoord.x = xRounded;
+                    startedCoord.y = yRounded;
+                }
+
+                if(DL.isMouseDown && DL.drawing) {
+                    that.clear(Interface.drawCtx);
+                    if(that.coord.inclineX !== 601/2){
+                        that.drawBezierCurve(Interface.drawCtx, auxiliarie.color, auxiliarie.width);
+                    }
+                }
+            }
+
+            callback(up, move);
         }
     }
 
@@ -213,11 +293,20 @@ class Interface {
 
     backgroundCtx;
     backgroundCanv;
+
     gridCtx;
     gridCanv;
+
     drawBoxCtx;
+    drawBoxCanv;
+
     cursorCtx;
+    cursorCanv;
+
     drawCtx;
+    drawCanv;
+
+    //initialization
 
     static initMenu(){
 
@@ -304,10 +393,9 @@ class Interface {
                     return;
                 }
 
-                let ulTag = document.createElement("div");
-                liTag.appendChild(ulTag);
+                
 
-                levelConstructor(ulTag, menuItem);
+                levelConstructor(liTag, menuItem);
             });
         }
 
@@ -324,8 +412,8 @@ class Interface {
             let canvases = document.createElement("div");
             canvases.setAttribute("class", 'canvases');
             paint.appendChild(canvases);
-            canvases.setAttribute('width', width + 1);
-            canvases.setAttribute('height', height + 1);
+            canvases.setAttribute('width', width);
+            canvases.setAttribute('height', height);
 
             document.body.appendChild(paint);
 
@@ -339,25 +427,30 @@ class Interface {
                 let canv = document.createElement('canvas');
                 canv.setAttribute('class', 'canvas');
                 canvases.appendChild(canv);
-                canv.setAttribute('width', width + 1);
-                canv.setAttribute('height', height + 1);
+                canv.setAttribute('width', width);
+                canv.setAttribute('height', height);
                 return canv;
         }
 
         function createBackground() {
             let backgroundCanv = createCanv();
             backgroundCanv.setAttribute('id', 'backgroundCanv');
+            Interface.backgroundCanv = backgroundCanv;    
+            Interface.backgroundCtx = backgroundCanv.getContext('2d');        
         }
 
         function createGrid() {
             let gridCanv = createCanv();
             gridCanv.setAttribute('id', 'gridCanv');
+            Interface.gridCanv = gridCanv;
+            Interface.gridCtx = gridCanv.getContext('2d');
         }
 
         function createDrawBox() {
             let drawBoxCanv = createCanv();
             drawBoxCanv.setAttribute('id', 'drawBoxCanv');
-
+            Interface.drawBoxCanv = drawBoxCanv;
+            Interface.drawBoxCtx = drawBoxCanv.getContext('2d');
         }
 
         function createAuxiliaries() {
@@ -365,16 +458,18 @@ class Interface {
             function cursor(){
                 let cursorCanv = createCanv();
                 cursorCanv.setAttribute('id', 'cursorCanv');
-
+                Interface.cursorCanv = cursorCanv;
+                Interface.cursorCtx = cursorCanv.getContext('2d');
             }
 
             function draw(){
                 let drawCanv = createCanv();
                 drawCanv.setAttribute('id', 'drawCanv');
+                Interface.drawCanv = drawCanv;
+                Interface.drawCtx = drawCanv.getContext('2d');
             }
             draw();
             cursor();
-            
         }
 
         createBackground();
@@ -385,37 +480,23 @@ class Interface {
     }
 
     static initEvents(){
-        let backgroundCanv = document.querySelector('#backgroundCanv');
-        Interface.backgroundCanv = backgroundCanv;
-        let gridCanv = document.querySelector('#gridCanv');
-        Interface.gridCanv = gridCanv;
-        let drawBoxCanv = document.querySelector('#drawBoxCanv');
-        let cursorCanv = document.querySelector('#cursorCanv');
-        let drawCanv = document.querySelector('#drawCanv');
-
-        Interface.backgroundCtx = backgroundCanv.getContext('2d');
-        Interface.gridCtx = gridCanv.getContext('2d');
-        Interface.drawBoxCtx = drawBoxCanv.getContext('2d');
-        Interface.cursorCtx = cursorCanv.getContext('2d');
-        Interface.drawCtx = drawCanv.getContext('2d');
-
         function mouse(){
-            cursorCanv.addEventListener('wheel', function(e) {
+            Interface.cursorCanv.addEventListener('wheel', function(e) {
                 if(!DL.gridView){
                     return;
                 }
                 dL.wheelGrid(e);
             });
 
-            cursorCanv.addEventListener('mouseup', function(e) {
+            Interface.cursorCanv.addEventListener('mouseup', function(e) {
                 dL.mouseLogic(e, 'up');
             });
             
-            cursorCanv.addEventListener('mousemove', function(e){
+            Interface.cursorCanv.addEventListener('mousemove', function(e){
                 dL.mouseLogic(e, 'move');
             });
     
-            cursorCanv.addEventListener('mousedown', function(e) {
+            Interface.cursorCanv.addEventListener('mousedown', function(e) {
                 DL.isMouseDown = true;
             });
         }
@@ -428,10 +509,19 @@ class Interface {
         }
         keyPress();
 
+        function clickListener(){
+            Interface.cursorCanv.addEventListener('click', function(e){
+                dL.clickListenerLogic(e);
+            });
+        }
+        clickListener();
+
         function otherEvents(){
             //
         }
     }
+
+    //initial menus
 
     static menu = {
         File: {
@@ -461,25 +551,19 @@ class Interface {
 
     static tools = {
         Draw: {
-            line: {
-                call: () => {},
+            icon: "path",
+            props: {
+                //...
             },
-            circle: {
-                call: () => {},
-            },
+            call: () => {},
         },
         Grid: {
-            width: {
-                call: () => {},
-            },
-            color: {
-                call: () => {},
-            },
-            cellCount: {
-                call: () => {},
-            },
+            icon: "path",
+            call: () => {},
         }
-    }
+    };
+
+    //methods for menus
 
     static CoordViewPanel(switchState) {
         function activate() {
@@ -511,3 +595,56 @@ class Interface {
 let dL = DL.init();
 
 dL.drawGrid(10);
+
+//for the future
+
+class WheelColor{
+
+    section = {
+        colorSelectionPlane: null,
+        hue: null,
+        localColor: null, //array, length = 4
+        wheelColorWalker: null, //array, length = 2
+        brightnessPlug: null, //array, length = 2
+        colorSaturation: null, //array, length = 2
+        webSafeColor: null, //array, length = 2
+        gradientPosition: null, //array, length = 2
+        swatches: {
+            segment: {
+                red: 'red',
+                blue: 'blue',
+                green: 'green',
+                black: 'black',
+                //...
+            }
+        }
+    };
+
+    constructor(){
+        //
+    }
+
+    init(){
+        //
+    }
+
+    initCreateSections(){
+        let wc = document.createElement('div');
+        wc.setAttribute('class', 'wheelColor');
+        document.body.appendChild(wc);
+        
+        let div = document.createElement('div');
+        div.setAttribute('class', 'div');
+        wc.appendChild(div);
+
+
+        let circle = document.createElement('div');
+        circle.setAttribute('class', 'circle');
+        div.appendChild(circle);
+        circle.setAttribute('width', '100px');
+        circle.setAttribute('height', '100px');
+        circle.setAttribute('position', 'absolute');
+    }
+}
+
+let wheelColor = new WheelColor();
