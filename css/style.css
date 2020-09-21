@@ -191,10 +191,11 @@ svg:hover{
     font-size: 16px;
 }
 
+.input{
+    display: block;
+}
+
 /*css from all elem*/
-
-
-
 
 .circle{
     display: inline-block;

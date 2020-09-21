@@ -28,19 +28,6 @@ class DL{
         widthLine: 0.5,
     }
 
-    static isMouseDown = false;
-
-    static gridView = true;
-
-    static drawing;
-
-    drawMode = {
-        line: true,
-        circle: false,
-        bezierCurve: false,
-        quadraticCurve: false,
-    }
-
     coord = {
         t: this,
         endedCoord: {
@@ -71,6 +58,19 @@ class DL{
             let coordY = this.customRound(y) / this.t.widthCube;
             console.log(event, coordX, coordY);
         },
+    };
+
+    static isMouseDown = false;
+
+    static gridView = true;
+
+    static drawing;
+
+    drawMode = {
+        line: true,
+        circle: false,
+        bezierCurve: false,
+        quadraticCurve: false,
     };
 
     constructor(width, height) {
@@ -116,15 +116,34 @@ class DL{
         ctx.stroke();
     }
 
-    drawBezierCurve(ctx = Interface.drawCtx, color, width){
+    drawQuadraticCurve(ctx = Interface.drawCtx, color, width){
+        let t = this.coord;
         ctx.beginPath();
         ctx.strokeStyle = color;
         ctx.lineWidth = width;
-        ctx.bezierCurveTo(this.coord.endedCoord.x, this.coord.endedCoord.y, this.coord.inclineX, this.coord.inclineY, this.coord.startedCoord.x, this.coord.startedCoord.y);
+        ctx.moveTo(t.startedCoord.x, t.startedCoord.y);
+        ctx.quadraticCurveTo(t.endedCoord.x, t.endedCoord.y, t.inclineX, t.inclineY);
         ctx.stroke();
         ctx.closePath();
     }
 
+    drawBezierCurve(ctx = Interface.drawCtx, color, width){
+        let t = this.coord;
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.bezierCurveTo(
+            t.endedCoord.x,
+            t.endedCoord.y, 
+            t.inclineX, 
+            t.inclineY, 
+            t.startedCoord.x, 
+            t.startedCoord.y
+        );
+        ctx.stroke();
+        ctx.closePath();
+    }
+    
     drawCursor(x, y, ctx = Interface.cursorCtx){
         let widthLine = Interface.gridCtx.lineWidth + 4;
         let widthLine2 = (Interface.gridCtx.lineWidth / 0.5);
@@ -206,6 +225,10 @@ class DL{
             lineLogic();
         }
 
+        if(that.drawMode.quadraticCurve){
+            quadraticCurveLogic();
+        }
+
         if(that.drawMode.bezierCurve){
             bezierCurveLogic();
         }
@@ -246,7 +269,7 @@ class DL{
             callback(up, move);
         }
 
-        //draw the bezierCurve
+        //draw the bezier curve
         function bezierCurveLogic(){
 
             function up(){
@@ -282,10 +305,59 @@ class DL{
 
             callback(up, move);
         }
+
+        //draw the quadratic curve
+        function quadraticCurveLogic(){
+
+            function up(){
+                that.clear(Interface.drawCtx);
+
+                that.coord.setEndedCoord(x, y);
+                if(DL.isMouseDown && DL.drawing){
+                    that.drawQuadraticCurve(Interface.drawBoxCtx, draw.color, draw.width);
+                    that.coord.sayCoords('DRAWING END', x, y);
+                }
+                DL.isMouseDown = false;
+                DL.drawing = false;
+            }
+
+            function move(){
+                that.coord.setEndedCoord(xRounded, yRounded);
+
+                if (DL.isMouseDown && !DL.drawing){
+                    that.coord.sayCoords('DRAWING FROM', x, y);
+                    DL.drawing = true;
+                    
+                    startedCoord.x = xRounded;
+                    startedCoord.y = yRounded;
+                }
+
+                if(DL.isMouseDown && DL.drawing) {
+                    that.clear(Interface.drawCtx);
+                    if(that.coord.inclineX !== 601/2){
+                        that.drawQuadraticCurve(Interface.drawCtx, auxiliarie.color, auxiliarie.width);
+                    }
+                }
+            }
+
+            callback(up, move);
+        }
     }
 
     keyPressLogic(e){
-        //
+        switch (e.code) {
+            case 'KeyZ':
+                Interface.gridView()
+                break;
+        }
+    }
+
+    changeDrawMode(value, object = dL.drawMode){
+        let keys = Object.keys(object);
+        keys.forEach((item, index)=>{
+            object[keys[index]] = false;
+        });
+        object[value] = true;
     }
 }
 
@@ -373,29 +445,57 @@ class Interface {
         menuTag.setAttribute("class", "vertical-menu");
         document.body.appendChild(menuTag);
 
-        function levelConstructor(contextTag, items) {
+        function levelConstructor(contextTag, items){
             let levelKeys = Object.keys(items);
-        
+
             levelKeys.forEach((menuItemName) => {
-
                 let liTag = document.createElement("li");
-                let divTag = document.createElement("div");
-                divTag.innerHTML = menuItemName;
-
-                liTag.appendChild(divTag);
-
-                contextTag.appendChild(liTag);
 
                 const menuItem = items[menuItemName];
-    
-                if("call" in menuItem) {
-                    liTag.addEventListener('click', menuItem.call);
-                    return;
+
+                if('icon' in menuItem){
+                    liTag.addEventListener('click', function(){
+                        if('props' in menuItem){
+                            let menu = document.createElement('div');
+                            menu.setAttribute('class', 'vertical-menu');
+                            menu.style.bottom = '0';
+                            document.body.appendChild(menu);
+                            createInputRange(menu);
+                        }
+                    });
+
+                    let imgTag = document.createElement("img");
+                    imgTag.setAttribute('width', '50x');
+                    imgTag.setAttribute('height', '50x');
+                    liTag.appendChild(imgTag);
+                    imgTag.src = menuItem.icon;
+
                 }
 
-                
+                if(menuItemName == 'Grid'){
+                    let divTag = document.createElement("div");
+                    divTag.innerHTML = menuItemName;
+                    liTag.appendChild(divTag);
+                    createInputRange(divTag);
+                }
 
-                levelConstructor(liTag, menuItem);
+                function createInputRange(contextTag){
+                    let div = document.createElement("div");
+                    contextTag.appendChild(div);
+                    div.innerHTML = 'Width of line';
+    
+                    let input = document.createElement('input');
+                    input.setAttribute('class', 'input');
+                    input.type = 'range';
+                    input.value = 1;
+                    input.max = 10;
+                    input.min = 0.1;
+                    input.step = 0.1
+                    contextTag.appendChild(input);
+                    input.addEventListener('change', menuItem.props['Width of line']); 
+                }
+
+                contextTag.appendChild(liTag); 
             });
         }
 
@@ -550,15 +650,35 @@ class Interface {
     };
 
     static tools = {
-        Draw: {
-            icon: "path",
+        Line: {
+            icon: "./images/line.png",
             props: {
-                //...
+                'Width of line': (e) => { Interface.setWidth('line', e.path[0].value )},
+                Color: () => {},
             },
-            call: () => {},
+            call: () => {console.log('call to line')},
+        },
+        Circle: {
+            icon: "./images/circle.png",
+            props: {
+                'Width of line': (e) => { Interface.setWidth('circle', e.path[0].value) },
+                Color: () => {},
+            },
+            call: () => {console.log('call to circle')},
+        },
+        quadraticCurve: {
+            icon: "./images/quadraticCurve.png",
+            props: {
+                'Width of line': (e) => { Interface.setWidth('quadraticCurve', e.path[0].value) },
+                Color: () => {},
+            },
+            call: () => {console.log('call to quadratic curve')},
         },
         Grid: {
-            icon: "path",
+            props: {
+                'Width of line': (e) => { Interface.setWidth('grid', e.path[0].value) },
+                Color: () => {},
+            },
             call: () => {},
         }
     };
@@ -588,6 +708,26 @@ class Interface {
         }else{
             dL.clear();
             DL.gridView = false;
+        }
+    }
+
+    //methods for tools menus
+
+    static setWidth(value, e){
+        if(value == 'line'){
+            dL.line.draw.width = e;
+           
+        }
+        if(value == 'circle'){
+        }
+        if(value == 'grid'){
+            dL.grid.widthLine = e;
+            dL.drawGrid();
+        }
+        if(value == 'quadraticCurve'){
+            dL.line.draw.width = e;
+            dL.drawGrid();
+            
         }
     }
 }
