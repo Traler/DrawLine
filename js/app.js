@@ -31,7 +31,7 @@ class DL{
         color: 'white',
         widthLine: 0.5,
         visibility: true,
-    }
+    };
 
     coord = {
         t: this,
@@ -39,29 +39,32 @@ class DL{
             x: -1,
             y: -1,
         },
-        startedCoord:{
+        startedCoord: {
             x: -1,
             y: -1,
         },
+        coordX: -1,
+        coordY: -1,
         inclineX: -1,
         inclineY: -1,
-        customRound(coord) {
-            return this.t.widthCube * Math.round(coord / this.t.widthCube);
+        customRound(e) {
+            let x = e.layerX - Interface.gridCanv.offsetLeft;
+            let y = e.layerY - Interface.gridCanv.offsetTop;
+            this.coordX = this.t.widthCube * Math.round(x / this.t.widthCube);
+            this.coordY = this.t.widthCube * Math.round(y / this.t.widthCube);
         },
-        localCoord(e){
-            return {
-                x: e.layerX - Interface.gridCanv.offsetLeft,
-                y: e.layerY - Interface.gridCanv.offsetTop,
-            };
+        setEndedCoord(){
+            this.endedCoord.x = this.coordX;
+            this.endedCoord.y = this.coordY;
         },
-        setEndedCoord(x, y){
-            this.endedCoord.x = this.customRound(x);
-            this.endedCoord.y = this.customRound(y);
+        setStartedCoord(){
+            this.startedCoord.x = this.coordX;
+            this.startedCoord.y = this.coordY;
         },
-        sayCoords(event, x, y){
-            let coordX = this.customRound(x) / this.t.widthCube;
-            let coordY = this.customRound(y) / this.t.widthCube;
-            console.log(event, coordX, coordY);
+        sayCoords(event){
+            let coordX = this.coordX;
+            let coordY = this.coordY;
+            console.log(event, coordX / this.t.widthCube, coordY / this.t.widthCube);
         },
     };
 
@@ -115,21 +118,29 @@ class DL{
     }
 
     drawLine(ctx, color, width){
+        let startedCoord = this.coord.startedCoord;
+        let endedCoord = this.coord.endedCoord;
         ctx.strokeStyle = color;
         ctx.lineWidth = width;
         ctx.beginPath();
-        ctx.moveTo(this.coord.startedCoord.x, this.coord.startedCoord.y);
-        ctx.lineTo(this.coord.endedCoord.x, this.coord.endedCoord.y); 
+        ctx.moveTo(startedCoord.x, startedCoord.y);
+        ctx.lineTo(endedCoord.x, endedCoord.y); 
         ctx.closePath();
         ctx.stroke();
     }
 
-    drawCircle(ctx, x, y, color, width){
-        let t = this;
+    drawCircle(ctx, color, width){
+        let circle = this.circle;
         ctx.beginPath();
         ctx.lineWidth = width;
         ctx.strokeStyle = color;
-        ctx.arc(x, y, t.widthCube, t.circle.startAngle, t.circle.endAngle, t.circle.arrow);
+        ctx.arc(
+            this.coord.coordX,
+            this.coord.coordY,
+            this.widthCube,
+            circle.startAngle,
+            circle.endAngle,
+            circle.arrow);
         ctx.stroke();
     }
 
@@ -161,7 +172,7 @@ class DL{
         ctx.closePath();
     }
     
-    drawCursor(x, y, ctx = Interface.cursorCtx){
+    drawCursor(ctx = Interface.cursorCtx){
         let cursor = this.cursor;
 
         if(!cursor.visibility){
@@ -174,7 +185,7 @@ class DL{
 
         ctx.fillStyle = cursor.color;
         ctx.beginPath();
-        ctx.arc(x, y, radius, 0, 2 * Math.PI);
+        ctx.arc(this.coord.coordX, this.coord.coordY, radius, 0, 2 * Math.PI);
         ctx.fill();
         ctx.stroke();
     }   
@@ -200,33 +211,26 @@ class DL{
         t.drawGrid(t.cellCount);
     }
 
-    //logic
+    //logic for draw mods
 
-    clickListenerLogic(e){
+    clickListenerLogic(){
         let t = this;
-        let x = t.coord.localCoord(e).x;
-        let y = t.coord.localCoord(e).y;
 
-        let xRounded = t.coord.customRound(x);
-        let yRounded = t.coord.customRound(y);
-
-        t.coord.inclineX = xRounded; 
-        t.coord.inclineY = yRounded; 
+        t.coord.inclineX = t.coord.coordX; 
+        t.coord.inclineY = t.coord.coordY; 
 
         if(!DL.drawMode.circle){
             return;
         }
-        t.drawCircle(Interface.drawBoxCtx, xRounded, yRounded, this.line.draw.color, this.line.draw.width);
+        t.drawCircle(Interface.drawBoxCtx, this.line.draw.color, this.line.draw.width);
     }
    
     mouseLogic(e, value){
         let that = this;
 
-        let x = that.coord.localCoord(e).x;
-        let y = that.coord.localCoord(e).y;
+        this.coord.customRound(e);
 
-        let xRounded = that.coord.customRound(x);
-        let yRounded = that.coord.customRound(y);
+        //auxiliary variables
 
         let startedCoord = that.coord.startedCoord;
         let endedCoord = that.coord.endedCoord;
@@ -236,24 +240,24 @@ class DL{
 
         let auxiliarie = that.line.auxiliarie;
         let draw = that.line.draw;
-       
-        that.clear(Interface.cursorCtx);
-        that.drawCursor(xRounded, yRounded);
 
-        function viewPanelLogic(){
-            that.viewPanelLogic(xRounded, yRounded);
+        //prepare for the draw
+       
+        that.clear(Interface.drawCtx);
+        that.drawCursor();
+        
+        if(DL.drawMode.circle){
+            that.drawCircle(Interface.drawCtx, auxiliarie.color, auxiliarie.width);
         }
+ 
 
         let callback = function(up, move){
             if(value == 'up'){
                 up();
-            }else if(value == 'move'){
+            }
+            if(value == 'move'){
                 move();
-                viewPanelLogic();
-                if(DL.drawMode.circle){
-                    that.drawCircle(Interface.cursorCtx, xRounded, yRounded, auxiliarie.color, auxiliarie.width);
-                }
-                
+                that.viewPanelLogic(); 
             }
         };
 
@@ -290,10 +294,10 @@ class DL{
             function up(){
                 that.clear(Interface.drawCtx);
 
-                that.coord.setEndedCoord(x, y);
+                that.coord.setEndedCoord();
                 if(DL.isMouseDown && DL.drawing){
                     that.drawLine(Interface.drawBoxCtx, draw.color, draw.width)
-                    that.coord.sayCoords('DRAWING END', x, y);
+                    that.coord.sayCoords('DRAWING END');
                     setHistory('line');
                 }
                 DL.isMouseDown = false;
@@ -301,14 +305,13 @@ class DL{
             }
 
             function move(){
-                that.coord.setEndedCoord(xRounded, yRounded);
+                that.coord.setEndedCoord();
 
                 if (DL.isMouseDown && !DL.drawing){
-                    that.coord.sayCoords('DRAWING FROM', x, y);
+                    that.coord.sayCoords('DRAWING FROM');
                     DL.drawing = true;
                 
-                    startedCoord.x = xRounded;
-                    startedCoord.y = yRounded;
+                    that.coord.setStartedCoord();
                 }
 
                 //draw the line
@@ -328,10 +331,10 @@ class DL{
             function up(){
                 that.clear(Interface.drawCtx);
 
-                that.coord.setEndedCoord(x, y);
+                that.coord.setEndedCoord();
                 if(DL.isMouseDown && DL.drawing){
                     that.drawBezierCurve(Interface.drawBoxCtx, draw.color, draw.width);
-                    that.coord.sayCoords('DRAWING END', x, y);
+                    that.coord.sayCoords('DRAWING END');
                     setHistory('bezierCurve');
                 }
                 DL.isMouseDown = false;
@@ -339,14 +342,14 @@ class DL{
             }
 
             function move(){
-                that.coord.setEndedCoord(xRounded, yRounded);
+                that.coord.setEndedCoord();
 
                 if (DL.isMouseDown && !DL.drawing){
-                    that.coord.sayCoords('DRAWING FROM', x, y);
+                    that.coord.sayCoords('DRAWING FROM');
                     DL.drawing = true;
                     
-                    startedCoord.x = xRounded;
-                    startedCoord.y = yRounded;
+                    that.coord.setStartedCoord();
+                    
                 }
 
                 if(DL.isMouseDown && DL.drawing) {
@@ -366,24 +369,24 @@ class DL{
             function up(){
                 that.clear(Interface.drawCtx);
 
-                that.coord.setEndedCoord(x, y);
+                that.coord.setEndedCoord();
                 if(DL.isMouseDown && DL.drawing){
                     that.drawQuadraticCurve(Interface.drawBoxCtx, draw.color, draw.width);
-                    that.coord.sayCoords('DRAWING END', x, y);
+                    that.coord.sayCoords('DRAWING END');
                 }
                 DL.isMouseDown = false;
                 DL.drawing = false;
             }
 
             function move(){
-                that.coord.setEndedCoord(xRounded, yRounded);
+                that.coord.setEndedCoord();
 
                 if (DL.isMouseDown && !DL.drawing){
-                    that.coord.sayCoords('DRAWING FROM', x, y);
+                    that.coord.sayCoords('DRAWING FROM');
                     DL.drawing = true;
                     
-                    startedCoord.x = xRounded;
-                    startedCoord.y = yRounded;
+                    that.coord.setStartedCoord();
+
                 }
 
                 if(DL.isMouseDown && DL.drawing) {
@@ -398,13 +401,7 @@ class DL{
         }
     }
 
-    keyPressLogic(e){
-        switch (e.code) {
-            case 'KeyZ':
-                Interface.gridView()
-                break;
-        }
-    }
+    //other logic
 
     changeDrawMode(value, object = DL.drawMode){
         let keys = Object.keys(object);
@@ -448,22 +445,21 @@ class DL{
 
     }
 
-    viewPanelLogic(x, y){
+    viewPanelLogic(){
         let viewPanel = Interface.viewPanel;
-
-        let coordX = Math.round(x / this.widthCube);  
-        let coordY = Math.round(y / this.widthCube);
+        let coordX = this.coord.coordX / this.widthCube;
+        let coordY = this.coord.coordY / this.widthCube;
 
         let string = `x: ${coordX} | y: ${coordY}`;
 
         if(!(coordX == coordY && this.cellCount / 2 == coordX)){
             viewPanel.innerHTML = string;
         }else{
-            viewPanel.innerHTML = 'centr ' + string;
+            viewPanel.innerHTML = 'centre ' + string;
         }
 
-        viewPanel.style.left = x;
-        viewPanel.style.top = y;
+        viewPanel.style.left = this.coord.coordX;
+        viewPanel.style.top = this.coord.coordY;
     }
 }
 
@@ -705,7 +701,6 @@ class Interface {
             });
     
             Interface.cursorCanv.addEventListener('mousedown', function(e) {
-                dL.mouseLogic(e, 'down');
                 DL.isMouseDown = true;
             });
         }
@@ -713,7 +708,7 @@ class Interface {
 
         function keyPress(){
             document.addEventListener('keypress', function(e){
-                dL.keyPressLogic(e)
+                Interface.keyPressLogic(e);
             });
         }
         keyPress();
@@ -724,10 +719,6 @@ class Interface {
             });
         }
         clickListener();
-
-        function otherEvents(){
-            //
-        }
     }
 
     static initViewPanel(){
@@ -822,9 +813,6 @@ class Interface {
 
     static drawMode(value){
         dL.changeDrawMode(value);
-        if(value == 'circle'){
-            dL.cursor.visibility = false;
-        }
     }
 
     static CoordViewPanel() {
@@ -945,6 +933,19 @@ class Interface {
         if(value == 'quadraticCurve'){
             dL.line.draw.width = e;
             dL.drawGrid();
+        }
+    }
+
+    //key press interface
+
+    static keyPressLogic(e){
+        switch (e.code) {
+            case 'KeyZ':
+                dL.undo()
+                break;
+            case 'KeyG':
+                Interface.gridView();
+                break;
         }
     }
 }
