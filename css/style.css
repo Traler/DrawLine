@@ -170,9 +170,9 @@ li > div{
 }
 
 svg{
-    width: 20px;
-    height: 20px;
-    display: inline-block;
+    width: 350px;
+    height: 350px;
+    display: block;
     stroke-width: 2px;
     stroke:white;
     fill:rgba(0, 0, 0, 0);
@@ -201,4 +201,12 @@ svg:hover{
     display: inline-block;
     background-color: white;
     border-radius: 999999px;
+}
+
+path:hover{
+    fill: chocolate;
+}
+
+.WheelColor{
+    display: none;
 }
