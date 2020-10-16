@@ -1,10 +1,14 @@
 class DrawLine {
     static init(){
+        //create canvases and menus
         Interface.init();
+        //draw the grid in draw space
         Grid.drawGrid();
         console.log('Method >Grid< drawed');
+        //create envents for listen a click, mouseMove, mouseUp...
         Events.init();
         console.log('Method >drawCursor< started');
+        //set draw mode (for draw line) (is a custom draw mode)
         Interface.setDrawMode('line');
         return new DrawLine();
     }
@@ -13,13 +17,16 @@ class DrawLine {
 
 class Interface {
 
+    //is a value has got a current drawLogic function
     static drawMode;
 
+    //is a size of canvases
     static drawBoxSize = {
         width: 601,
         height: 601,
     };
 
+    //is a canvases and contexts of canvas for draw a background
     backgroundCtx;
     backgroundCanv;
 
@@ -35,11 +42,13 @@ class Interface {
     drawCtx;
     drawCanv;
 
+    //function of draw a canvases and menus
     static init(){
-        this.initCanvases(601, 601);
+        this.initCanvases(Interface.drawBoxSize.width, Interface.drawBoxSize.height);
         console.log('Class >Interface< started');
     }
 
+    //draw canvases
     static initCanvases(width, height){
         //create the canvas
 
@@ -117,6 +126,7 @@ class Interface {
 
     }
 
+    //function for change the draw mode (line, circle...)
     static setDrawMode(value){
         switch(value){
             case "line":
@@ -128,6 +138,7 @@ class Interface {
         console.log('drawMode >'+ value +'< setted');
     }
 
+    //function for wheel the grid in draw space
     static wheelGrid(e = Events.e){   
 
         let max = Grid.cellCount <= 300;
@@ -144,12 +155,13 @@ class Interface {
 }
 
 class Events {
-
+    
+    //add events
     static init(){
         Events.mouseEvents();
         console.log('Class >Events< started');
     }
-
+    //add mouse events
     static mouseEvents(){
         Interface.cursorCanv.addEventListener('mouseup', function(e) {
             Interface.drawMode(e, 'MouseUp');
@@ -157,6 +169,7 @@ class Events {
         
         Interface.cursorCanv.addEventListener('mousemove', function(e){
             Interface.drawMode(e, 'MouseMove');
+            //draw the cursor
             Cursor.drawCursor();
         });
 
@@ -176,19 +189,23 @@ class Events {
 
 class Coord {
 
+    //is a first coord
     static endedCoord = {
         x: -1,
         y: -1,
     }
     
+    //is a second coord
     static startedCoord = {
         x: -1,
         y: -1,
     }
 
+    //Is a magnetized coordinates to the grid
     static coordX = -1;
     static coordY = -1;
 
+    //set a coordX and coordY
     static customRound(e) {
         let x = e.layerX - Interface.gridCanv.offsetLeft;
         let y = e.layerY - Interface.gridCanv.offsetTop;
@@ -196,16 +213,19 @@ class Coord {
         Coord.coordY = Grid.widthCube * Math.round(y / Grid.widthCube);
     }
 
+    //set 'endedCoord' for draw
     static setEndedCoord(){
         Coord.endedCoord.x = Coord.coordX;
         Coord.endedCoord.y = Coord.coordY;
     }
 
+    //set 'startedCoord' for draw
     static setStartedCoord(){
         Coord.startedCoord.x = Coord.coordX;
         Coord.startedCoord.y = Coord.coordY;
     }
 
+    //say the cords
     static sayCoords(event){
         let coordX = Coord.coordX;
         let coordY = Coord.coordY;
@@ -214,7 +234,8 @@ class Coord {
     
 }
 
-
+//is a class for grid.
+//grid logic and how to draw a grid
 class Grid {
     static drawMode = 'grid';
 
@@ -270,7 +291,7 @@ class Cursor {
     }
 }
 
-
+//is abstract class for custom props for other figures
 class Figure {
 
     static drawing;
@@ -287,8 +308,11 @@ class Figure {
     }
 }
 
+//is a class for draw line
+//and how to draw a line
 class Line extends Figure {
 
+    //how to draw the line
     static drawLine(ctx, color = Line.color){
         let startedCoord = Coord.startedCoord;
         let endedCoord = Coord.endedCoord;
@@ -303,6 +327,7 @@ class Line extends Figure {
       
     }
 
+    //logic for draw the line
     static lineLogic(e, value){
 
         Coord.customRound(e);
@@ -346,6 +371,7 @@ class Line extends Figure {
 }
 
 
+//start the program
 window.onload = function(){
     let drawLine = DrawLine.init();
 }
