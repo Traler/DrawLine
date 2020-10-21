@@ -26,6 +26,7 @@ class Interface {
         height: 601,
     };
 
+    
     //is a canvases and contexts of canvas for draw a background
     backgroundCtx;
     backgroundCanv;
@@ -42,10 +43,15 @@ class Interface {
     drawCtx;
     drawCanv;
 
+    viewPanel;
+
     //function of draw a canvases and menus
     static init(){
+        //draw the menu
+        this.initMenu();
         this.initCanvases(Interface.drawBoxSize.width, Interface.drawBoxSize.height);
         console.log('Class >Interface< started');
+        this.initViewPanel();
     }
 
     //draw canvases
@@ -126,6 +132,148 @@ class Interface {
 
     }
 
+    static initViewPanel(){
+        let viewPanel = document.createElement("div"); 
+        viewPanel.setAttribute('class', 'coordView');
+
+        Interface.cursorCanv.parentNode.appendChild(viewPanel);
+        viewPanel.style.display = 'none';
+        Interface.viewPanel = viewPanel;
+    }
+
+    static menu = {
+        File: {
+            'New document': {
+                call: Interface.CreateNewDoc,
+            },
+            "Import": {
+                "Image background": {
+                    call: Interface.changeBackground,
+                },
+                "Line list": {
+                    call: null,
+                },
+            },
+            'Save as image': {
+                call: Interface.saveAsImage,
+            },
+            'Save as line list': {
+                call: null,
+            },
+        },
+        View: {
+            'CoordView': {
+                call: Interface.CoordViewPanel,
+                switchable: "Off",
+            },
+            'Grid': {
+                call: Interface.gridView,
+                switchable: "On",
+            },
+        },
+        'Draw Mode':{
+            'Line': {
+                call: () => {Interface.setDrawMode('line')},
+            },
+            'Circle': {
+                call: () => {Interface.setDrawMode('circle')},
+            },
+            'Bezier curve': {
+                call: () => {Interface.setDrawMode('bezierCurve')},
+            }
+        }
+    };
+
+    static initMenu(){
+
+        let headerTag = document.createElement("header");
+
+        let menuTag = document.createElement("div");
+        menuTag.setAttribute("class", "horizontal-menu");
+
+        let menuUlTag = document.createElement("ul");
+
+        menuTag.appendChild(menuUlTag);
+        headerTag.appendChild(menuTag);
+
+        document.body.appendChild(headerTag);
+
+        function levelConstructor(contextTag, items) {
+            let levelKeys = Object.keys(items);
+        
+            levelKeys.forEach((menuItemName) => {
+                let liTag = document.createElement("li");
+                let divTag = document.createElement("div");
+                divTag.innerHTML = menuItemName;
+
+                liTag.appendChild(divTag);
+
+                contextTag.appendChild(liTag);
+
+                const menuItem = items[menuItemName];
+    
+                if("call" in menuItem) {
+                    liTag.addEventListener('click', menuItem.call);
+                        if("switchable" in menuItem){
+                            let rightLi = document.createElement('div');
+                            liTag.appendChild(rightLi);
+                            rightLi.innerHTML = menuItem.switchable;
+
+                            liTag.addEventListener('click', function(e){
+                                if(rightLi.innerHTML == 'On'){
+                                    rightLi.innerHTML = 'Off';
+                                }else if(rightLi.innerHTML == 'Off'){
+                                    rightLi.innerHTML = 'On';
+                                }
+                               
+                            });
+
+                            menuItem.switchable = rightLi;
+                            rightLi.setAttribute('class', 'rightLi');
+                        }
+                    return;
+                }
+
+                let ulTag = document.createElement("ul");
+                liTag.appendChild(ulTag);
+
+                levelConstructor(ulTag, menuItem);
+            });
+        }
+
+        levelConstructor(menuUlTag, Interface.menu);
+    }
+
+    //draw the coord panel
+    static coordPanelLogic(){
+        let viewPanel = Interface.viewPanel;
+        let coordX = Coord.coordX / Grid.widthCube;
+        let coordY = Coord.coordY / Grid.widthCube;
+
+        let string = `x: ${coordX} | y: ${coordY}`;
+
+        if(!(coordX == coordY && Grid.cellCount / 2 == coordX)){
+            viewPanel.innerHTML = string;
+        }else{
+            viewPanel.innerHTML = 'centre ' + string;
+        }
+
+        viewPanel.style.left = Coord.coordX;
+        viewPanel.style.top = Coord.coordY;
+    }
+
+    //on or off the coord panel
+    static CoordViewPanel() {
+        let viewPanel = Interface.viewPanel;
+        let switchable = Interface.menu.View.CoordView.switchable;
+
+        if(switchable.innerHTML == 'Off'){
+            viewPanel.style.display = 'block';
+        }else if(switchable.innerHTML == 'On'){
+            viewPanel.style.display = 'none';
+        }
+    }
+
     //function for change the draw mode (line, circle...)
     static setDrawMode(value){
         switch(value){
@@ -137,22 +285,8 @@ class Interface {
         }
         console.log('drawMode >'+ value +'< setted');
     }
-
-    //function for wheel the grid in draw space
-    static wheelGrid(e = Events.e){   
-
-        let max = Grid.cellCount <= 300;
-        let min = Grid.cellCount >= 1;
-        let interval = max && min;
-    
-        if(interval && e.deltaY > 0 || !max){
-            Grid.cellCount -= 1;
-        }else{
-            Grid.cellCount += 1;
-        }
-        Grid.drawGrid(Grid.cellCount);
-    }
 }
+
 
 class Events {
     
@@ -171,6 +305,8 @@ class Events {
             Interface.drawMode(e, 'MouseMove');
             //draw the cursor
             Cursor.drawCursor();
+            //draw the coord panel
+            Interface.coordPanelLogic();
         });
 
         Interface.cursorCanv.addEventListener('mousedown', function(e) {
@@ -178,7 +314,7 @@ class Events {
         });
 
         Interface.cursorCanv.addEventListener('wheel', function(e){
-            Interface.wheelGrid(e);
+            Grid.wheel(e);
         });
 
         Interface.cursorCanv.addEventListener('click', function(e){
@@ -246,13 +382,17 @@ class Grid {
     static widthCube;
 
     static visibility = true;
+    static wheelGrid = true;
 
     static drawGrid(cellCount = Grid.cellCount, ctx = Interface.gridCtx){
+        if(!Grid.visibility){
+            return;
+        }
         Figure.clear(ctx);
 
         Grid.widthCube = Interface.drawBoxSize.width / cellCount;
 
-        ctx.lineWidth = Grid.widthLine;
+        ctx.lineWidth = Grid.width;
         ctx.strokeStyle = Grid.color;
     
         for (let n = 0; n < cellCount*Grid.widthCube; n+=Grid.widthCube) {
@@ -265,6 +405,23 @@ class Grid {
         }
     }
 
+    //function for wheel the grid in draw space
+    static wheel(e){   
+        if(!Grid.wheelGrid){
+            return;
+        }
+
+        let max = Grid.cellCount <= 300;
+        let min = Grid.cellCount >= 1;
+        let interval = max && min;
+
+        if(interval && e.deltaY > 0 || !max){
+            Grid.cellCount -= 1;
+        }else{
+            Grid.cellCount += 1;
+        }
+        Grid.drawGrid(Grid.cellCount);
+}
 
 }
 
@@ -288,6 +445,123 @@ class Cursor {
         ctx.arc(Coord.coordX, Coord.coordY, Cursor.radius, 0, 2 * Math.PI);
         ctx.fill();
         ctx.stroke();
+    }
+}
+
+class History {
+
+    static history = [];
+
+    static setHistory(type){
+        History.history.push(
+            [
+                {
+                    x: Coord.startedCoord.x,
+                    y: Coord.startedCoord.y
+                },
+                {
+                    x: Coord.endedCoord.x,
+                    y: Coord.endedCoord.y
+                },
+                {
+                    color: Line.color,
+                    width: Line.width,
+                },
+                type,
+            ]
+        );
+    }
+
+    static drawLinesFromObject(lineList, ctx = Interface.drawBoxCtx) {
+
+        lineList.forEach((lineCoords) => {
+            ctx.beginPath();
+            ctx.strokeStyle = lineCoords[2]['color'];
+            ctx.lineWidth = lineCoords[2]['width'];
+
+            if(lineCoords[3] == 'line'){
+                ctx.moveTo(lineCoords[0].x, lineCoords[0].y);
+                ctx.lineTo(lineCoords[1].x, lineCoords[1].y);
+            }else if (lineCoords[3] == 'bezierCurve'){
+                ctx.bezierCurveTo(
+                    lineCoords[1].x,
+                    lineCoords[1].y, 
+                    lineCoords[4].inclineX, 
+                    lineCoords[4].inclineY, 
+                    lineCoords[0].x, 
+                    lineCoords[0].y
+                );
+            }
+
+            ctx.stroke();
+            ctx.closePath();
+            
+        });
+
+    }
+
+    static undo(history = History.history){
+        history.pop();
+        Figure.clear(Interface.drawBoxCtx);
+        History.drawLinesFromObject(history);
+    }
+
+    static saveAsLineList(history = History.history){
+        let a = document.createElement("a"); 
+
+        document.body.appendChild(a);
+        a.style.display = 'none';
+
+        let str = JSON.stringify(history, null, 3);
+        
+        let file = new Blob([str], {type: "text/javascript"});
+        a.href = URL.createObjectURL(file);
+        a.download = 'Line List.txt';
+        a.click();
+        
+        a.parentNode.removeChild(a);
+    }
+
+    static openLineList(color, width){
+        let input = document.createElement("input"); 
+
+        document.body.appendChild(input);
+        input.style.display = 'none';
+        input.type = 'file';
+
+        input.addEventListener('change', function(e){
+            let file = e.target.files[0];
+
+            if (!file) {
+                return;
+            }
+            let reader = new FileReader();
+
+            reader.onload = function(e) {
+                let data = e.target.result;
+                
+                let parseData = JSON.parse(data);
+
+                color = prompt('color:', '#00ff08');
+                width = prompt('width:', 1);
+                width = Number(width);
+
+                if(typeof color == 'string' && typeof width == 'number'){
+                    parseData.forEach(function(item, index){
+                        parseData[index][2].width = width;
+                     parseData[index][2].color = color;
+                     })
+                }
+                
+                History.history = History.history.concat(parseData); 
+                
+                History.drawLinesFromObject(parseData);
+            };
+            reader.readAsText(file);
+        });
+
+        input.click();
+        input.parentNode.removeChild(input);
     }
 }
 
@@ -339,6 +613,7 @@ class Line extends Figure {
             if(Line.isMouseDown && Line.drawing){
                 Line.drawLine(Interface.drawBoxCtx, Line.color)
                 Coord.sayCoords('DRAWING END');
+                History.setHistory('line');
             }
             Line.isMouseDown = false;
             Line.drawing = false;
