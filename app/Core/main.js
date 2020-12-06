@@ -1,7 +1,6 @@
 import { Events } from             "./evenst.js";
-import {  Grid  } from   "./drawMods/grid.js";
-import { Interface } from             "./interface.js";
-
+import {  Grid  } from   "../Interface/DrawArea/grid.js";
+import { Interface } from             "../Interface/interface.js";
 
 export class DrawLine {
 

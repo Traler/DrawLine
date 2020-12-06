@@ -1,11 +1,11 @@
-import { DrawLine } from './main.js';
-import { Coord } from './cord.js';
-import { Line } from './drawMods/line.js';
-import { BezierCurve } from './drawMods/bezierCurve.js';
-import { Circle } from './drawMods/circle.js';
-import { Grid } from './drawMods/grid.js';
-import { Figure } from './drawMods/figure.js';
-import { History } from './history.js';
+import { DrawLine } from '../Core/main.js';
+import { Coord } from '../Core/coord.js';
+import { Line } from '../DrawTools/line.js';
+import { BezierCurve } from '../DrawTools/bezierCurve.js';
+import { Circle } from '../DrawTools/circle.js';
+import { Grid } from '../Interface/DrawArea/grid.js';
+import { Figure } from '../DrawTools/figure.js';
+import { History } from '../Core/history.js';
 
 
 export class Interface {
@@ -57,6 +57,31 @@ export class Interface {
             }
         }
     };
+
+    static initEvents(){
+        DrawLine.cursorCanv.addEventListener('click', function(e){
+            Interface.drawMode(e, 'Click');
+        });
+        DrawLine.cursorCanv.addEventListener('mouseup', function(e) {
+            Interface.drawMode(e, 'MouseUp');
+        });
+        
+        DrawLine.cursorCanv.addEventListener('mousemove', function(e){
+            Interface.drawMode(e, 'MouseMove');
+            
+            //draw the coord panel
+            Interface.coordPanelLogic();
+        });
+
+        DrawLine.cursorCanv.addEventListener('mousedown', function(e) {
+            Interface.drawMode(e, 'MouseDown');
+        });
+        document.addEventListener('keydown', (e)=>{
+            if(e.code == 'KeyS'){
+                Interface.saveAsImage();
+            }
+        });
+    }
 
     //draw the coord panel
     static coordPanelLogic(){

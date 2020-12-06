@@ -1,15 +1,16 @@
-import { Coord } from './cord.js';
-import { Line } from './drawMods/line.js';
-import { Circle } from './drawMods/circle.js';
-import { BezierCurve } from './drawMods/bezierCurve.js';
+import { Coord } from './coord.js';
+import { Line } from '../DrawTools/line.js';
+import { Circle } from '../DrawTools/circle.js';
+import { BezierCurve } from '../DrawTools/bezierCurve.js';
 import { DrawLine } from             "./main.js";
-import { Figure } from './drawMods/figure.js';
+import { Figure } from '../DrawTools/figure.js';
 
 export class History {
 
     static history = [];
 
     static setHistory(type){
+
         History.history.push(
             [
                 {
@@ -97,6 +98,14 @@ export class History {
         history.pop();
         Figure.clear(DrawLine.drawBoxCtx);
         History.drawLinesFromObject(history);
+    }
+
+    static initEvents(){
+        document.addEventListener('keydown', function(e){
+            if(e.code == 'KeyZ'){
+                History.undo(); 
+            }
+        });
     }
 
     static saveAsLineList(history = History.history){

@@ -1,9 +1,9 @@
 import { Figure } from './figure.js';
-import { DrawLine } from '../main.js';
+import { DrawLine } from '../Core/main.js';
 
-import { History } from '../history.js';
+import { History } from '../Core/history.js';
 
-import { Coord } from '../cord.js';
+import { Coord } from '../Core/coord.js';
 
 //is a class for draw line
 //and how to draw a line

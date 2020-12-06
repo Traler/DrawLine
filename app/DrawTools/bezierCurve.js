@@ -1,8 +1,8 @@
 import { Figure } from './figure.js';
-import { Coord } from '../cord.js';
-import { DrawLine } from '../main.js';
-import { Interface } from '../interface.js';
-import { History } from '../history.js';
+import { Coord } from '../Core/coord.js';
+import { DrawLine } from '../Core/main.js';
+import { Interface } from '../Interface/interface.js';
+import { History } from '../Core/history.js';
 
 export class BezierCurve extends Figure {
 

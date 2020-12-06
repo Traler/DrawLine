@@ -1,4 +1,4 @@
-import { Grid   }   from  "./drawMods/grid.js";
+import { Grid   }   from  "../Interface/DrawArea/grid.js";
 import { DrawLine } from './main.js';
 
 export class Coord {
@@ -47,5 +47,4 @@ export class Coord {
 
         console.log(event, coordX / Grid.widthCube, coordY / Grid.widthCube);
     }
-    
 }

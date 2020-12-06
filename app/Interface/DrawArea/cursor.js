@@ -1,6 +1,6 @@
-import { DrawLine } from './main.js';
-import { Coord } from './cord.js';
-import { Figure } from './drawMods/figure.js';
+import { Coord } from '../../Core/coord.js';
+import { Figure } from '../../DrawTools/figure.js';
+import { DrawLine } from '../../Core/main.js';
 
 export class Cursor {
 
@@ -8,6 +8,12 @@ export class Cursor {
     static radius = 3;
 
     static visibility = true;
+
+    static ininEvents(){
+        document.addEventListener('mousemove', (e)=>{
+            Cursor.drawCursor();
+        });
+    }
 
     static drawCursor(ctx = DrawLine.cursorCtx){
 

@@ -1,4 +1,5 @@
-import { DrawLine } from '../main.js';
+import { DrawLine } from '../Core/main.js';
+
 //is abstract class for custom props for other figures
 export class Figure {
 

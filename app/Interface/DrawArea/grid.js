@@ -1,5 +1,5 @@
-import { Figure } from './figure.js';
-import { DrawLine } from '../main.js';
+import { Figure } from '../../DrawTools/figure.js';
+import { DrawLine } from '../../Core/main.js';
 
 //is a class for grid.
 //grid logic and how to draw a grid
@@ -14,6 +14,19 @@ export class Grid {
 
     static visibility = true;
     static wheelGrid = true;
+
+    static ininEvents(){
+
+        document.addEventListener('keydown', function(e){
+            if(e.code == 'KeyG'){
+                Grid.gridView(); 
+            }
+        });
+        
+        document.addEventListener('wheel', function(e){
+            Grid.wheel(e);
+        }); 
+    }
 
     static drawGrid(cellCount = Grid.cellCount, ctx = DrawLine.gridCtx){
         if(!Grid.visibility){
