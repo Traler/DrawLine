@@ -1,6 +1,7 @@
 import {  Grid  } from   "../Interface/DrawArea/grid.js";
 import {  Cursor  } from   "../Interface/DrawArea/cursor.js";
-import {  Interface  } from   "../Interface/interface.js";
+import {  Menu  } from   "../Interface/menu.js";
+import {  CoordPanel  } from   "../Interface/DrawArea/coordPanel.js";
 import { History } from './history.js';
 
 export class Events {    
@@ -9,8 +10,9 @@ export class Events {
     static init(){
         Grid.ininEvents();
         History.initEvents();
-        Interface.initEvents();
+        Menu.initEvents();
         Cursor.ininEvents();
+        CoordPanel.initEvents();
         console.log('Class >Events< started');
     }
 }

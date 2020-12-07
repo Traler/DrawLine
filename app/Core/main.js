@@ -1,6 +1,8 @@
 import { Events } from             "./evenst.js";
 import {  Grid  } from   "../Interface/DrawArea/grid.js";
-import { Interface } from             "../Interface/interface.js";
+import { Menu } from             "../Interface/menu.js";
+import { ToolsMenu } from "../Interface/toolsMenu.js";
+import { WheelColor } from "../Interface/wheelColor.js";
 
 export class DrawLine {
 
@@ -29,7 +31,9 @@ export class DrawLine {
 
     static init(){
         //create menu
-        DrawLine.initMenu();
+        Menu.initMenu();
+        ToolsMenu.initTools()
+        WheelColor.init();
 
         //create canvases
         DrawLine.initCanvases(DrawLine.drawBoxSize.width, DrawLine.drawBoxSize.height);
@@ -47,7 +51,7 @@ export class DrawLine {
         console.log('Method >drawCursor< started');
 
         //set draw mode (for draw line) (is a custom draw mode)
-        Interface.setDrawMode('line');
+        Menu.setDrawMode('line');
 
         //run the app
         return new DrawLine();
@@ -137,66 +141,6 @@ export class DrawLine {
         DrawLine.cursorCanv.parentNode.appendChild(viewPanel);
         viewPanel.style.display = 'none';
         DrawLine.viewPanel = viewPanel;
-    }
-
-    static initMenu(){
-
-        let headerTag = document.createElement("header");
-
-        let menuTag = document.createElement("div");
-        menuTag.setAttribute("class", "horizontal-menu");
-
-        let menuUlTag = document.createElement("ul");
-
-        menuTag.appendChild(menuUlTag);
-        headerTag.appendChild(menuTag);
-
-        document.body.appendChild(headerTag);
-
-        function levelConstructor(contextTag, items) {
-            let levelKeys = Object.keys(items);
-        
-            levelKeys.forEach((menuItemName) => {
-                let liTag = document.createElement("li");
-                let divTag = document.createElement("div");
-                divTag.innerHTML = menuItemName;
-
-                liTag.appendChild(divTag);
-
-                contextTag.appendChild(liTag);
-
-                const menuItem = items[menuItemName];
-    
-                if("call" in menuItem) {
-                    liTag.addEventListener('click', menuItem.call);
-                        if("switchable" in menuItem){
-                            let rightLi = document.createElement('div');
-                            liTag.appendChild(rightLi);
-                            rightLi.innerHTML = menuItem.switchable;
-
-                            liTag.addEventListener('click', function(e){
-                                if(rightLi.innerHTML == 'On'){
-                                    rightLi.innerHTML = 'Off';
-                                }else if(rightLi.innerHTML == 'Off'){
-                                    rightLi.innerHTML = 'On';
-                                }
-                               
-                            });
-
-                            menuItem.switchable = rightLi;
-                            rightLi.setAttribute('class', 'rightLi');
-                        }
-                    return;
-                }
-
-                let ulTag = document.createElement("ul");
-                liTag.appendChild(ulTag);
-
-                levelConstructor(ulTag, menuItem);
-            });
-        }
-
-        levelConstructor(menuUlTag, Interface.menu);
     }
 }
 

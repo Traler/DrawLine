@@ -1,7 +1,7 @@
 import { Figure } from './figure.js';
 import { Coord } from '../Core/coord.js';
 import { DrawLine } from '../Core/main.js';
-import { Interface } from '../Interface/interface.js';
+import { Menu } from '../Interface/menu.js';
 import { History } from '../Core/history.js';
 
 export class BezierCurve extends Figure {
@@ -32,16 +32,17 @@ export class BezierCurve extends Figure {
         function click(){
             BezierCurve.inclineX = Coord.startedCoord.x;
             BezierCurve.inclineY = Coord.startedCoord.y;
+            console.log(BezierCurve.inclineX, BezierCurve.inclineY);
         }
 
         function up(){
-            BezierCurve.clear(Interface.drawCtx);
+            BezierCurve.clear(Menu.drawCtx);
 
             Coord.setEndedCoord();
             if(BezierCurve.isMouseDown && BezierCurve.drawing){
-                BezierCurve.drawBezierCurve(Interface.drawBoxCtx);
+                BezierCurve.drawBezierCurve(Menu.drawBoxCtx);
                 Coord.sayCoords('DRAWING END');
-                History.setHistory('bezierCurve');
+                BezierCurve.setHistory();
             }
             BezierCurve.isMouseDown = false;
             BezierCurve.drawing = false;
@@ -59,9 +60,9 @@ export class BezierCurve extends Figure {
             }
 
             if(BezierCurve.isMouseDown && BezierCurve.drawing) {
-                BezierCurve.clear(Interface.drawCtx);
+                BezierCurve.clear(Menu.drawCtx);
                 if(Coord.inclineX !== 601/2){
-                    BezierCurve.drawBezierCurve(Interface.drawCtx);
+                    BezierCurve.drawBezierCurve(Menu.drawCtx);
                 }
             }
         }
@@ -83,5 +84,52 @@ export class BezierCurve extends Figure {
         if(value == 'MouseDown'){
             BezierCurve.isMouseDown = true;
         }
+    }
+
+    static setHistory(){
+        console.log(History.history);
+
+        History.history.push([
+            {
+                x: Coord.startedCoord.x,
+                y: Coord.startedCoord.y
+            },
+            {
+                x: Coord.endedCoord.x,
+                y: Coord.endedCoord.y
+            },
+            {
+                color: BezierCurve.color,
+                width: BezierCurve.width,
+            },
+            {
+                BezierCurve: BezierCurve.inclineX,
+                BezierCurve: BezierCurve.inclineY,
+            },
+            'bezierCurve',
+        ]);
+    }
+
+    static reDraw(history, ctx = DrawLine.drawBoxCtx){
+        history.forEach((drawList) => {
+            
+            ctx.strokeStyle = drawList[2]['color'];
+            ctx.lineWidth = drawList[2]['width'];
+            ctx.beginPath();
+    
+            if(drawList[3] == 'bezierCurve'){
+                ctx.bezierCurveTo(
+                    drawList[1].x,
+                    drawList[1].y,
+                    drawList[3].inclineX,
+                    drawList[3].inclineY,
+                    drawList[0].x,
+                    drawList[0].y,
+                );
+            }
+            ctx.stroke();
+            ctx.closePath();
+            
+        });
     }
 }

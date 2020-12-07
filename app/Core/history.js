@@ -9,89 +9,10 @@ export class History {
 
     static history = [];
 
-    static setHistory(type){
-
-        History.history.push(
-            [
-                {
-                    x: Coord.startedCoord.x,
-                    y: Coord.startedCoord.y
-                },
-                {
-                    x: Coord.endedCoord.x,
-                    y: Coord.endedCoord.y
-                },
-                {
-                    color: Line.color,
-                    width: Line.width,
-                },
-                type,
-            ]
-        );
-
-        if(type == 'circle'){
-            const length = History.history.length - 1;
-            History.history[length].push(
-                {
-                    Radius: Circle.radius,
-                    StartAngle: Circle.startAngle,
-                    EndAngle: Circle.endAngle,
-                    Arrow: Circle.arrow,
-                }
-            );
-        }
-
-        if(type == 'bezierCurve'){
-            const length = History.history.length - 1;
-            History.history[length].push(
-                {
-                    BezierCurve: BezierCurve.inclineX,
-                    BezierCurve: BezierCurve.inclineY,
-                }
-            );
-        }
-    }
-
-    static drawLinesFromObject(lineList, ctx = DrawLine.drawBoxCtx) {
-
-        lineList.forEach((lineCoords) => {
-            
-            ctx.strokeStyle = lineCoords[2]['color'];
-            ctx.lineWidth = lineCoords[2]['width'];
-            ctx.beginPath();
-
-            if(lineCoords[3] == 'line'){
-                ctx.moveTo(lineCoords[0].x, lineCoords[0].y);
-                ctx.lineTo(lineCoords[1].x, lineCoords[1].y);
-            }
-            
-            if (lineCoords[3] == 'bezierCurve'){
-                ctx.bezierCurveTo(
-                    lineCoords[1].x,
-                    lineCoords[1].y, 
-                    lineCoords[4].inclineX, 
-                    lineCoords[4].inclineY, 
-                    lineCoords[0].x, 
-                    lineCoords[0].y
-                );
-            }
-            
-            if(lineCoords[3] == 'circle'){
-                ctx.arc(
-                    lineCoords[1].x,
-                    lineCoords[1].y,
-                    lineCoords[4].Radius,
-                    lineCoords[4].StartAngle,
-                    lineCoords[4].EndAngle,
-                    lineCoords[4].Arrow,
-                );
-            }
-
-            ctx.stroke();
-            ctx.closePath();
-            
-        });
-
+    static drawLinesFromObject(drawHistory) {
+        Line.reDraw(drawHistory);
+        Circle.reDraw(drawHistory);
+        BezierCurve.reDraw(drawHistory);
     }
 
     static undo(history = History.history){

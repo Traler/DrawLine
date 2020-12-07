@@ -1,4 +1,4 @@
-import {Figure} from './figure.js';
+import { Figure } from './figure.js';
 import { Coord } from '../Core/coord.js';
 import { DrawLine } from '../Core/main.js';
 import {  Grid  } from   "../Interface/DrawArea/grid.js";
@@ -38,7 +38,7 @@ export class Circle extends Figure {
 
       function click(){
           Circle.drawCircle();
-          History.setHistory('circle');
+          Circle.setHistory();
           Coord.sayCoords('DRAWING IN');
       }
 
@@ -52,5 +52,49 @@ export class Circle extends Figure {
           move();
       }
 
+  }
+
+  static setHistory(){
+      console.log(History.history);
+    History.history.push([
+        {
+            x: Coord.startedCoord.x,
+            y: Coord.startedCoord.y
+        },
+        {
+            color: Circle.color,
+            width: Circle.width,
+        },
+        {
+            Radius: Circle.radius,
+            StartAngle: Circle.startAngle,
+            EndAngle: Circle.endAngle,
+            Arrow: Circle.arrow,
+        },
+        "circle",
+    ]);
+  }
+
+  static reDraw(history, ctx = DrawLine.drawBoxCtx){
+    history.forEach((drawList) => {
+            
+        ctx.strokeStyle = drawList[2]['color'];
+        ctx.lineWidth = drawList[2]['width'];
+        ctx.beginPath();
+
+        if(drawList[3] == 'circle'){
+            ctx.arc(
+                drawList[0].x,
+                drawList[0].y,
+                drawList[2].Radius,
+                drawList[2].StartAngle,
+                drawList[2].EndAngle,
+                drawList[2].Arrow,
+            );
+        }
+        ctx.stroke();
+        ctx.closePath();
+        
+    });
   }
 }

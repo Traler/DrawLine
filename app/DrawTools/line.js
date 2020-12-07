@@ -35,7 +35,7 @@ export class Line extends Figure {
             if(Line.isMouseDown && Line.drawing){
                 Line.drawLine(DrawLine.drawBoxCtx, Line.color)
                 Coord.sayCoords('DRAWING END');
-                History.setHistory('line');
+                Line.setHistory();
             }
             Line.isMouseDown = false;
             Line.drawing = false;
@@ -68,5 +68,42 @@ export class Line extends Figure {
         if(value == 'MouseDown'){
             Line.isMouseDown = true;
         }
+    }
+
+    static setHistory(){
+      console.log(History.history);
+
+        History.history.push([
+            {
+                x: Coord.startedCoord.x,
+                y: Coord.startedCoord.y
+            },
+            {
+                x: Coord.endedCoord.x,
+                y: Coord.endedCoord.y
+            },
+            {
+                color: Line.color,
+                width: Line.width,
+            },
+            'line',
+        ]);
+    }
+
+    static reDraw(history, ctx = DrawLine.drawBoxCtx){
+        history.forEach((drawList) => {
+            
+            ctx.strokeStyle = drawList[2]['color'];
+            ctx.lineWidth = drawList[2]['width'];
+            ctx.beginPath();
+
+            if(drawList[3] == 'line'){
+                ctx.moveTo(drawList[0].x, drawList[0].y);
+                ctx.lineTo(drawList[1].x, drawList[1].y);
+            }
+            ctx.stroke();
+            ctx.closePath();
+            
+        });
     }
 }
