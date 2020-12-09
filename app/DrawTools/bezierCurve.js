@@ -1,6 +1,7 @@
 import { Figure } from './figure.js';
 import { Coord } from '../Core/coord.js';
 import { DrawLine } from '../Core/main.js';
+import { DrawSpace } from "../Interface/drawSpace.js";
 import { Menu } from '../Interface/menu.js';
 import { History } from '../Core/history.js';
 
@@ -9,7 +10,7 @@ export class BezierCurve extends Figure {
     static inclineX = 601/2;
     static inclineY = 601/2;
 
-    static drawBezierCurve(ctx = DrawLine.drawBoxCtx){
+    static drawBezierCurve(ctx = DrawSpace.drawBoxCtx){
         ctx.beginPath();
         ctx.strokeStyle = BezierCurve.color;
         ctx.lineWidth = BezierCurve.width;
@@ -36,11 +37,11 @@ export class BezierCurve extends Figure {
         }
 
         function up(){
-            BezierCurve.clear(Menu.drawCtx);
+            BezierCurve.clear(DrawSpace.drawCtx);
 
             Coord.setEndedCoord();
             if(BezierCurve.isMouseDown && BezierCurve.drawing){
-                BezierCurve.drawBezierCurve(Menu.drawBoxCtx);
+                BezierCurve.drawBezierCurve(DrawSpace.drawBoxCtx);
                 Coord.sayCoords('DRAWING END');
                 BezierCurve.setHistory();
             }
@@ -60,9 +61,9 @@ export class BezierCurve extends Figure {
             }
 
             if(BezierCurve.isMouseDown && BezierCurve.drawing) {
-                BezierCurve.clear(Menu.drawCtx);
+                BezierCurve.clear(DrawSpace.drawCtx);
                 if(Coord.inclineX !== 601/2){
-                    BezierCurve.drawBezierCurve(Menu.drawCtx);
+                    BezierCurve.drawBezierCurve(DrawSpace.drawCtx);
                 }
             }
         }
@@ -110,7 +111,7 @@ export class BezierCurve extends Figure {
         ]);
     }
 
-    static reDraw(history, ctx = DrawLine.drawBoxCtx){
+    static reDraw(history, ctx = DrawSpace.drawBoxCtx){
         history.forEach((drawList) => {
             
             ctx.strokeStyle = drawList[2]['color'];

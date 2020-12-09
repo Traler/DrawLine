@@ -1,4 +1,5 @@
 import { DrawLine } from '../Core/main.js';
+import { DrawSpace } from "../Interface/drawSpace.js";
 
 //is abstract class for custom props for other figures
 export class Figure {
@@ -10,9 +11,9 @@ export class Figure {
     static color = 'blue';
     static auxiliarieColor = 'red';
 
-    static clear(ctx = DrawLine.gridCtx){
-        let width = DrawLine.drawBoxSize.width;
-        let height = DrawLine.drawBoxSize.height;
+    static clear(ctx = DrawSpace.gridCtx){
+        let width = DrawSpace.drawBoxSize.width;
+        let height = DrawSpace.drawBoxSize.height;
         ctx.clearRect(0, 0, width, height); 
     }
 }

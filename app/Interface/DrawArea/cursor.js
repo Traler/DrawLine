@@ -1,6 +1,7 @@
 import { Coord } from '../../Core/coord.js';
 import { Figure } from '../../DrawTools/figure.js';
 import { DrawLine } from '../../Core/main.js';
+import { DrawSpace } from "../drawSpace.js";
 
 export class Cursor {
 
@@ -15,7 +16,7 @@ export class Cursor {
         });
     }
 
-    static drawCursor(ctx = DrawLine.cursorCtx){
+    static drawCursor(ctx = DrawSpace.cursorCtx){
 
         if(!Cursor.visibility){
             return;

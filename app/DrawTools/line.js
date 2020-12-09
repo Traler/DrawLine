@@ -1,5 +1,6 @@
 import { Figure } from './figure.js';
 import { DrawLine } from '../Core/main.js';
+import { DrawSpace } from "../Interface/drawSpace.js";
 
 import { History } from '../Core/history.js';
 
@@ -29,11 +30,11 @@ export class Line extends Figure {
         Coord.customRound(e);
 
         function up(){
-            Line.clear(DrawLine.drawCtx);
+            Line.clear(DrawSpace.drawCtx);
 
             Coord.setEndedCoord();
             if(Line.isMouseDown && Line.drawing){
-                Line.drawLine(DrawLine.drawBoxCtx, Line.color)
+                Line.drawLine(DrawSpace.drawBoxCtx, Line.color)
                 Coord.sayCoords('DRAWING END');
                 Line.setHistory();
             }
@@ -54,8 +55,8 @@ export class Line extends Figure {
             //draw the line
             
             if(Line.isMouseDown && Line.drawing) {
-                Line.clear(DrawLine.drawCtx);
-                Line.drawLine(DrawLine.drawCtx, Line.auxiliarieColor);
+                Line.clear(DrawSpace.drawCtx);
+                Line.drawLine(DrawSpace.drawCtx, Line.auxiliarieColor);
             }
         }
 
@@ -90,7 +91,7 @@ export class Line extends Figure {
         ]);
     }
 
-    static reDraw(history, ctx = DrawLine.drawBoxCtx){
+    static reDraw(history, ctx = DrawSpace.drawBoxCtx){
         history.forEach((drawList) => {
             
             ctx.strokeStyle = drawList[2]['color'];

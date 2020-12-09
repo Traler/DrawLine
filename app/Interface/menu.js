@@ -1,4 +1,4 @@
-import { DrawLine } from '../Core/main.js';
+import { DrawSpace } from './drawSpace.js';
 import { Line } from '../DrawTools/line.js';
 import { BezierCurve } from '../DrawTools/bezierCurve.js';
 import { Circle } from '../DrawTools/circle.js';
@@ -91,7 +91,7 @@ export class Menu {
         },
         View: {
             'CoordView': {
-                call: CoordPanel.CoordViewPanel,
+                call: ()=>{CoordPanel.CoordViewPanel()},
                 switchable: "Off",
             },
             'GridView': {
@@ -113,18 +113,18 @@ export class Menu {
     };
 
     static initEvents(){
-        DrawLine.cursorCanv.addEventListener('click', function(e){
+        DrawSpace.cursorCanv.addEventListener('click', function(e){
             Menu.drawMode(e, 'Click');
         });
-        DrawLine.cursorCanv.addEventListener('mouseup', function(e) {
+        DrawSpace.cursorCanv.addEventListener('mouseup', function(e) {
             Menu.drawMode(e, 'MouseUp');
         });
         
-        DrawLine.cursorCanv.addEventListener('mousemove', function(e){
+        DrawSpace.cursorCanv.addEventListener('mousemove', function(e){
             Menu.drawMode(e, 'MouseMove');
         });
 
-        DrawLine.cursorCanv.addEventListener('mousedown', function(e) {
+        DrawSpace.cursorCanv.addEventListener('mousedown', function(e) {
             Menu.drawMode(e, 'MouseDown');
         });
         document.addEventListener('keydown', (e)=>{
@@ -146,16 +146,16 @@ export class Menu {
                 Menu.drawMode = BezierCurve.bezierCurveLogic;
         }
         console.log('drawMode >'+ value +'< setted');
-        Figure.clear(DrawLine.drawCtx);
+        Figure.clear(DrawSpace.drawCtx);
     }
 
     static CreateNewDoc() {
         History.history.length = 0;
-        Figure.clear(DrawLine.drawBoxCtx);
+        Figure.clear(DrawSpace.drawBoxCtx);
     }
 
     static saveAsImage(nameOfImg = 'My image') {
-        let url = DrawLine.drawBoxCanv.toDataURL();
+        let url = DrawSpace.drawBoxCanv.toDataURL();
 
         let a = document.createElement("a"); 
 
@@ -170,6 +170,6 @@ export class Menu {
     }
 
     static changeBackground(){
-        backgroundCanv.style.backgroundImage = "url('" + prompt('Change image url for background') + "')";
+        DrawSpace.backgroundCanv.style.backgroundImage = "url('" + prompt('Change image url for background') + "')";
     }
 }

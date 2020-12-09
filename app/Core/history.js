@@ -1,9 +1,10 @@
-import { Coord } from './coord.js';
+import { DrawLine } from             "./main.js";
+import { Figure } from '../DrawTools/figure.js';
 import { Line } from '../DrawTools/line.js';
 import { Circle } from '../DrawTools/circle.js';
 import { BezierCurve } from '../DrawTools/bezierCurve.js';
-import { DrawLine } from             "./main.js";
-import { Figure } from '../DrawTools/figure.js';
+import { DrawSpace } from "../Interface/drawSpace.js";
+
 
 export class History {
 
@@ -17,7 +18,7 @@ export class History {
 
     static undo(history = History.history){
         history.pop();
-        Figure.clear(DrawLine.drawBoxCtx);
+        Figure.clear(DrawSpace.drawBoxCtx);
         History.drawLinesFromObject(history);
     }
 

@@ -1,5 +1,5 @@
 import { Grid   }   from  "../Interface/DrawArea/grid.js";
-import { DrawLine } from './main.js';
+import { DrawSpace } from '../Interface/drawSpace.js';
 
 export class Coord {
 
@@ -21,8 +21,8 @@ export class Coord {
 
     //set a coordX and coordY
     static customRound(e) {
-        let x = e.layerX - DrawLine.gridCanv.offsetLeft;
-        let y = e.layerY - DrawLine.gridCanv.offsetTop;
+        let x = e.layerX - DrawSpace.gridCanv.offsetLeft;
+        let y = e.layerY - DrawSpace.gridCanv.offsetTop;
         Coord.coordX = Grid.widthCube * Math.round(x / Grid.widthCube);
         Coord.coordY = Grid.widthCube * Math.round(y / Grid.widthCube);
     }

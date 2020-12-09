@@ -3,6 +3,7 @@ import { Coord } from '../Core/coord.js';
 import { DrawLine } from '../Core/main.js';
 import {  Grid  } from   "../Interface/DrawArea/grid.js";
 import { History } from '../Core/history.js';
+import { DrawSpace } from "../Interface/drawSpace.js";
 
 
 export class Circle extends Figure {
@@ -12,7 +13,7 @@ export class Circle extends Figure {
   static arrow = false;
   static radius = 60.1;
 
-  static drawCircle(ctx = DrawLine.drawBoxCtx){
+  static drawCircle(ctx = DrawSpace.drawBoxCtx){
       Circle.radius = Grid.widthCube;
       ctx.strokeStyle = Circle.color;
       ctx.lineWidth = Circle.width;
@@ -31,7 +32,7 @@ export class Circle extends Figure {
   static circleLogic(e, value){
 
       Coord.customRound(e);
-      Circle.clear(DrawLine.drawCtx)
+      Circle.clear(DrawSpace.drawCtx)
 
       Coord.setEndedCoord();
       Coord.setStartedCoord();
@@ -43,7 +44,7 @@ export class Circle extends Figure {
       }
 
       function move(){
-          Circle.drawCircle(DrawLine.drawCtx);
+          Circle.drawCircle(DrawSpace.drawCtx);
       }
       
       if(value == 'Click'){
@@ -75,7 +76,7 @@ export class Circle extends Figure {
     ]);
   }
 
-  static reDraw(history, ctx = DrawLine.drawBoxCtx){
+  static reDraw(history, ctx = DrawSpace.drawBoxCtx){
     history.forEach((drawList) => {
             
         ctx.strokeStyle = drawList[2]['color'];

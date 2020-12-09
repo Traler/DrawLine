@@ -1,5 +1,6 @@
 import { Figure } from '../../DrawTools/figure.js';
 import { DrawLine } from '../../Core/main.js';
+import { DrawSpace } from "../drawSpace.js";
 
 //is a class for grid.
 //grid logic and how to draw a grid
@@ -28,13 +29,13 @@ export class Grid {
         }); 
     }
 
-    static drawGrid(cellCount = Grid.cellCount, ctx = DrawLine.gridCtx){
+    static drawGrid(cellCount = Grid.cellCount, ctx = DrawSpace.gridCtx){
         if(!Grid.visibility){
             return;
         }
         Figure.clear(ctx);
 
-        Grid.widthCube = DrawLine.drawBoxSize.width / cellCount;
+        Grid.widthCube = DrawSpace.drawBoxSize.width / cellCount;
 
         ctx.lineWidth = Grid.width;
         ctx.strokeStyle = Grid.color;
