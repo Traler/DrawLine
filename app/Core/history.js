@@ -1,10 +1,8 @@
-import { DrawLine } from             "./main.js";
 import { Figure } from '../DrawTools/figure.js';
 import { Line } from '../DrawTools/line.js';
 import { Circle } from '../DrawTools/circle.js';
 import { BezierCurve } from '../DrawTools/bezierCurve.js';
 import { DrawSpace } from "../Interface/drawSpace.js";
-
 
 export class History {
 

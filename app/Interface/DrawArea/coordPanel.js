@@ -1,4 +1,3 @@
-import { DrawLine } from '../../Core/main.js';
 import { Coord } from '../../Core/coord.js';
 import { Grid } from '../../Interface/DrawArea/grid.js';
 import { Menu } from '../../Interface/menu.js';

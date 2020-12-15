@@ -1,9 +1,7 @@
-import { Figure } from './figure.js';
-import { Coord } from '../Core/coord.js';
-import { DrawLine } from '../Core/main.js';
+import { Figure    } from './figure.js';
+import { Coord     } from '../Core/coord.js';
 import { DrawSpace } from "../Interface/drawSpace.js";
-import { Menu } from '../Interface/menu.js';
-import { History } from '../Core/history.js';
+import { History   } from '../Core/history.js';
 
 export class BezierCurve extends Figure {
 
@@ -26,14 +24,13 @@ export class BezierCurve extends Figure {
         ctx.closePath();
     }
 
-    static bezierCurveLogic(e, value){
+    static drawLogic(e, value){
 
         Coord.customRound(e);
         
         function click(){
             BezierCurve.inclineX = Coord.startedCoord.x;
             BezierCurve.inclineY = Coord.startedCoord.y;
-            console.log(BezierCurve.inclineX, BezierCurve.inclineY);
         }
 
         function up(){
@@ -62,17 +59,17 @@ export class BezierCurve extends Figure {
 
             if(BezierCurve.isMouseDown && BezierCurve.drawing) {
                 BezierCurve.clear(DrawSpace.drawCtx);
-                if(Coord.inclineX !== 601/2){
-                    BezierCurve.drawBezierCurve(DrawSpace.drawCtx);
-                }
+               
+                BezierCurve.drawBezierCurve(DrawSpace.drawCtx);
+                
             }
         }
-        
 
         if(value == 'Click'){
+            Coord.setStartedCoord();
             click();
+            console.log(BezierCurve.inclineX, BezierCurve.inclineY, Coord.startedCoord.x);
         }
-
 
         if(value == 'MouseMove'){
             move();
@@ -104,8 +101,8 @@ export class BezierCurve extends Figure {
                 width: BezierCurve.width,
             },
             {
-                BezierCurve: BezierCurve.inclineX,
-                BezierCurve: BezierCurve.inclineY,
+                inclineX: BezierCurve.inclineX,
+                inclineY: BezierCurve.inclineY,
             },
             'bezierCurve',
         ]);
@@ -118,7 +115,7 @@ export class BezierCurve extends Figure {
             ctx.lineWidth = drawList[2]['width'];
             ctx.beginPath();
     
-            if(drawList[3] == 'bezierCurve'){
+            if(drawList[4] == 'bezierCurve'){
                 ctx.bezierCurveTo(
                     drawList[1].x,
                     drawList[1].y,

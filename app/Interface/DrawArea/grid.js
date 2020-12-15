@@ -1,5 +1,4 @@
 import { Figure } from '../../DrawTools/figure.js';
-import { DrawLine } from '../../Core/main.js';
 import { DrawSpace } from "../drawSpace.js";
 
 //is a class for grid.
@@ -16,7 +15,7 @@ export class Grid {
     static visibility = true;
     static wheelGrid = true;
 
-    static ininEvents(){
+    static initEvents(){
 
         document.addEventListener('keydown', function(e){
             if(e.code == 'KeyG'){
@@ -51,14 +50,12 @@ export class Grid {
     }
 
     static gridView(){
-        if(Grid.visibility){
-            Grid.visibility = false;
-            Grid.wheelGrid = false;
+        Grid.visibility = !Grid.visibility;
+        Grid.wheelGrid = !Grid.wheelGrid;
+
+        if(!Grid.visibility){
             Figure.clear();
         }else{
-            Grid.visibility = true;
-            Grid.wheelGrid = true;
-          
             Grid.drawGrid();
         }
     }
@@ -79,6 +76,5 @@ export class Grid {
             Grid.cellCount += 1;
         }
         Grid.drawGrid(Grid.cellCount);
-}
-
+    }
 }

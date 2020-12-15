@@ -1,10 +1,8 @@
-import { Figure } from './figure.js';
-import { Coord } from '../Core/coord.js';
-import { DrawLine } from '../Core/main.js';
-import {  Grid  } from   "../Interface/DrawArea/grid.js";
-import { History } from '../Core/history.js';
+import { Figure    } from './figure.js';
+import { Coord     } from '../Core/coord.js';
+import { Grid      } from   "../Interface/DrawArea/grid.js";
+import { History   } from '../Core/history.js';
 import { DrawSpace } from "../Interface/drawSpace.js";
-
 
 export class Circle extends Figure {
 
@@ -29,7 +27,7 @@ export class Circle extends Figure {
       ctx.stroke();
   }
 
-  static circleLogic(e, value){
+  static drawLogic(e, value){
 
       Coord.customRound(e);
       Circle.clear(DrawSpace.drawCtx)

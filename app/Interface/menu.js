@@ -1,11 +1,12 @@
 import { DrawSpace } from './drawSpace.js';
-import { Line } from '../DrawTools/line.js';
-import { BezierCurve } from '../DrawTools/bezierCurve.js';
-import { Circle } from '../DrawTools/circle.js';
 import { Grid } from '../Interface/DrawArea/grid.js';
 import { Figure } from '../DrawTools/figure.js';
 import { History } from '../Core/history.js';
 import { CoordPanel } from './DrawArea/coordPanel.js';
+import { Circle } from '../DrawTools/circle.js';
+import { BezierCurve } from '../DrawTools/bezierCurve.js';
+
+import { Line } from "../DrawTools/line.js";
 
 export class Menu {
 
@@ -101,52 +102,23 @@ export class Menu {
         },
         'Draw Mode':{
             'Line': {
-                call: () => {Menu.setDrawMode('line')},
+                call: () => {Line.setDrawMode()},
             },
             'Circle': {
-                call: () => {Menu.setDrawMode('circle')},
+                call: () => {Circle.setDrawMode()},
             },
             'Bezier curve': {
-                call: () => {Menu.setDrawMode('bezierCurve')},
+                call: () => {BezierCurve.setDrawMode()},
             }
         }
     };
 
     static initEvents(){
-        DrawSpace.cursorCanv.addEventListener('click', function(e){
-            Menu.drawMode(e, 'Click');
-        });
-        DrawSpace.cursorCanv.addEventListener('mouseup', function(e) {
-            Menu.drawMode(e, 'MouseUp');
-        });
-        
-        DrawSpace.cursorCanv.addEventListener('mousemove', function(e){
-            Menu.drawMode(e, 'MouseMove');
-        });
-
-        DrawSpace.cursorCanv.addEventListener('mousedown', function(e) {
-            Menu.drawMode(e, 'MouseDown');
-        });
         document.addEventListener('keydown', (e)=>{
             if(e.code == 'KeyS'){
                 Menu.saveAsImage();
             }
         });
-    }
-
-    static setDrawMode(value){
-        switch(value){
-            case "line":
-                Menu.drawMode = Line.lineLogic;
-                break;
-            case "circle":
-                Menu.drawMode = Circle.circleLogic;
-                break;
-            case "bezierCurve":
-                Menu.drawMode = BezierCurve.bezierCurveLogic;
-        }
-        console.log('drawMode >'+ value +'< setted');
-        Figure.clear(DrawSpace.drawCtx);
     }
 
     static CreateNewDoc() {

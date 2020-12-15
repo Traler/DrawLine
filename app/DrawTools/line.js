@@ -1,9 +1,6 @@
 import { Figure } from './figure.js';
-import { DrawLine } from '../Core/main.js';
 import { DrawSpace } from "../Interface/drawSpace.js";
-
 import { History } from '../Core/history.js';
-
 import { Coord } from '../Core/coord.js';
 
 //is a class for draw line
@@ -25,7 +22,7 @@ export class Line extends Figure {
     }
 
     //logic for draw the line
-    static lineLogic(e, value){
+    static drawLogic(e, value){
 
         Coord.customRound(e);
 

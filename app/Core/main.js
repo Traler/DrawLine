@@ -1,11 +1,12 @@
-import {  Cursor  } from   "../Interface/DrawArea/cursor.js";
-import {  Grid  } from   "../Interface/DrawArea/grid.js";
-import { Menu } from             "../Interface/menu.js";
-import { ToolsMenu } from "../Interface/toolsMenu.js";
+import { Grid       } from "../Interface/DrawArea/grid.js";
+import { Menu       } from "../Interface/menu.js";
+import { ToolsMenu  } from "../Interface/toolsMenu.js";
 import { WheelColor } from "../Interface/wheelColor.js";
 import { CoordPanel } from "../Interface/DrawArea/coordPanel.js";
-import { DrawSpace } from "../Interface/drawSpace.js";
-import { History } from "./history.js"
+import { DrawSpace  } from "../Interface/drawSpace.js";
+import { Line } from "../DrawTools/line.js";
+
+import EventList from "./eventList.js";
 
 export class DrawLine {
 
@@ -19,24 +20,19 @@ export class DrawLine {
 
         //create canvases
         DrawSpace.initCanvases(DrawSpace.drawBoxSize.width, DrawSpace.drawBoxSize.height);
-        console.log('Class >Interface< started');
 
         //create coord view panel
         CoordPanel.createCoordPanel();
 
         //draw the grid in draw space
         Grid.drawGrid();
-        console.log('Method >Grid< drawed');
 
-        //create envents
-        Grid.ininEvents();
-        History.initEvents();
-        Cursor.ininEvents();
-        Menu.initEvents();
-        CoordPanel.initEvents();
+        EventList.forEach((el)=>{
+            el.initEvents();
+        });
 
         //set draw mode (for draw line) (is a custom draw mode)
-        Menu.setDrawMode('line');
+        Line.setDrawMode();
 
         //run the app
         return new DrawLine();
