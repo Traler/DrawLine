@@ -1,5 +1,3 @@
-
-
 export class DrawSpace {
     static drawBoxSize = {
         width: 601,

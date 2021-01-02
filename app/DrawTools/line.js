@@ -69,7 +69,6 @@ export class Line extends Figure {
     }
 
     static setHistory(){
-      console.log(History.history);
 
         History.history.push([
             {
